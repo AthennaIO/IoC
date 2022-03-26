@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
-import { IoC } from './src/IoC'
+import { Ioc } from 'src/Ioc'
 
 export {}
 
@@ -22,5 +22,7 @@ const _global = global as any
 if (!_global.ioc) {
   _global.ioc = {}
 
-  _global.ioc.use = new IoC().use
+  _global.ioc.use = new Ioc().use
 }
+
+export * from 'src/Ioc'
