@@ -1,12 +1,12 @@
 {
-  "name": "@athenna/template",
+  "name": "@athenna/ioc",
   "version": "1.0.0",
   "description": "",
   "license": "MIT",
   "author": "João Lenon <lenon@athenna.io>",
-  "repository": "https://github.com/AthennaIO/Template.git",
-  "bugs": "https://github.com/AthennaIO/Template/issues",
-  "homepage": "https://github.com/AthennaIO/Template#readme",
+  "repository": "https://github.com/AthennaIO/IoC.git",
+  "bugs": "https://github.com/AthennaIO/IoC/issues",
+  "homepage": "https://github.com/AthennaIO/IoC#readme",
   "scripts": {
     "build": "tsc --project tsconfig.json && tscpaths -p tsconfig.json -s . -o .",
     "test": "npm run lint:fix && NODE_TS=true NODE_ENV=testing jest --verbose",
@@ -70,11 +70,12 @@
       "ts"
     ],
     "rootDir": ".",
-    "testRegex": ".spec.ts$",
+    "testRegex": "Test.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
     "coverageDirectory": "./coverage",
+    "preset": "ts-jest",
     "testEnvironment": "node"
   },
   "prettier": {
@@ -150,7 +151,9 @@
     }
   },
   "dependencies": {
+    "@secjs/utils": "1.7.8",
+    "awilix": "7.0.0",
     "reflect-metadata": "0.1.13",
-    "tscpaths": "^0.0.9"
+    "tscpaths": "0.0.9"
   }
 }
