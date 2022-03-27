@@ -9,12 +9,14 @@
   "homepage": "https://github.com/AthennaIO/IoC#readme",
   "scripts": {
     "build": "tsc --project tsconfig.json && tscpaths -p tsconfig.json -s . -o .",
-    "test": "npm run lint:fix && NODE_TS=true NODE_ENV=testing jest --verbose",
-    "test:debug": "DEBUG=api:exceptions NODE_TS=true NODE_ENV=testing jest --verbose",
+    "test": "npm run lint:fix && cross-env NODE_TS=true cross-env NODE_ENV=testing jest --verbose",
+    "test:debug": "npm run lint:fix && cross-env NODE_TS=true cross-env NODE_ENV=testing cross-env DEBUG=api:* jest --verbose",
     "lint:fix": "eslint \"{src,tests}/**/*.ts\" --fix"
   },
   "keywords": [
     "nodejs",
+    "awilix",
+    "ioc-container",
     "athenna",
     "typescript"
   ],
@@ -24,6 +26,7 @@
     "@typescript-eslint/eslint-plugin": "4.31.0",
     "@typescript-eslint/parser": "4.31.0",
     "commitizen": "4.2.4",
+    "cross-env": "7.0.3",
     "cz-conventional-changelog": "3.3.0",
     "eslint": "7.32.0",
     "eslint-config-prettier": "8.3.0",
