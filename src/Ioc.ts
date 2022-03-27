@@ -48,6 +48,10 @@ export class Ioc {
     return Ioc.container.resolve<Dependency>(alias) as Dependency
   }
 
+  safeUse<Dependency = any>(alias: string): Dependency {
+    return Ioc.container.resolve<Dependency>(alias) as Dependency
+  }
+
   alias(alias: string, dependencyAlias: string): this {
     this.verifyDependencyAlias(alias)
 
