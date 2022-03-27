@@ -27,7 +27,6 @@ jobs:
         id: release
       - name: Publish to NPM Registry
         run: npm publish --access public
-        if: steps.release.outputs.released == 'true'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           name: Deploy
