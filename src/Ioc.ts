@@ -82,7 +82,7 @@ export class Ioc {
     } else if (Is.Function(Dependency)) {
       Ioc.container.register(alias, asFunction(Dependency)[registerType]())
     } else {
-      Ioc.container.register(alias, asValue(Dependency)[registerType]())
+      Ioc.container.register(alias, asValue(Dependency))
     }
 
     if (alias.includes('/')) {
