@@ -40,15 +40,19 @@ export class Ioc {
     return this
   }
 
-  use<Dependency = any>(alias: string): Dependency {
+  use<Dependency = any>(alias: string): Dependency | undefined {
+    try {
+      return Ioc.container.resolve<Dependency>(alias) as Dependency
+    } catch (error) {
+      return undefined
+    }
+  }
+
+  safeUse<Dependency = any>(alias: string): Dependency {
     if (!this.hasDependency(alias)) {
       throw new NotFoundDependencyException(alias)
     }
 
-    return Ioc.container.resolve<Dependency>(alias) as Dependency
-  }
-
-  safeUse<Dependency = any>(alias: string): Dependency {
     return Ioc.container.resolve<Dependency>(alias) as Dependency
   }
 

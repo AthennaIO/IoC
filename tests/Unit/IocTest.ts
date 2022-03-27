@@ -20,7 +20,7 @@ describe('\n IocTest', () => {
     ioc.singleton('Services/ClientService', ClientService)
     ioc.bind('Services/UserService', UserService)
 
-    const userService = ioc.use<UserService>('Services/UserService')
+    const userService = ioc.safeUse<UserService>('Services/UserService')
 
     expect(userService.find()).toHaveLength(3)
   })
@@ -29,7 +29,7 @@ describe('\n IocTest', () => {
     ioc.singleton('Services/ClientService', ClientService)
     ioc.singleton('Services/UserService', UserService)
 
-    const userService = ioc.use<UserService>('userService')
+    const userService = ioc.safeUse<UserService>('userService')
 
     expect(userService.find()).toHaveLength(3)
   })
@@ -67,9 +67,39 @@ describe('\n IocTest', () => {
     ioc.singleton('Services/ClientService', ClientService)
     ioc.singleton('Services/UserService', UserService)
 
-    const userService = ioc.use<UserService>('userService')
+    const userService = ioc.safeUse<UserService>('userService')
 
     expect(userService.find()).toHaveLength(3)
     expect(userService.find()[0].clients).toHaveLength(2)
+  })
+
+  it('should be able to create alias from other providers in the Ioc', async () => {
+    ioc
+      .singleton('Services/ClientService', ClientService)
+      .alias('Services/Aliases/ClientService', 'Services/ClientService')
+
+    const clientService = ioc.safeUse<ClientService>('Services/Aliases/ClientService')
+
+    expect(clientService.find()).toHaveLength(2)
+    expect(clientService.find()[0]).toStrictEqual({ id: 1, name: 'LinkApi' })
+  })
+
+  it('should return undefined when the dependency does not exist', async () => {
+    const clientService = ioc.use('Services/ClientService')
+
+    expect(clientService).toBeFalsy()
+  })
+
+  it('should throw an error when trying to use a dependency that does not exist', async () => {
+    ioc.singleton('Services/ClientService', ClientService)
+
+    try {
+      ioc.safeUse<ClientService>('Services/Aliases/ClientService')
+    } catch (error) {
+      expect(error.name).toBe('NotFoundDependencyException')
+      expect(error.content).toBe(
+        'The dependency alias Services/Aliases/ClientService has not been found inside the container',
+      )
+    }
   })
 })
