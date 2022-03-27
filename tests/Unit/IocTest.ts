@@ -59,7 +59,7 @@ describe('\n IocTest', () => {
     } catch (error) {
       expect(error.name).toBe('DependencyAlreadyExistsException')
       expect(error.status).toBe(500)
-      expect(error.content).toBe(`The alias UserService is already in use inside the container`)
+      expect(error.content).toBe(`The alias userService is already in use inside the container`)
     }
   })
 
