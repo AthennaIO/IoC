@@ -15,12 +15,12 @@ import {
   AwilixContainer,
   ContainerOptions,
   createContainer,
-  GlobWithOptions,
   InjectionMode,
 } from 'awilix'
 
 import { Is, String } from '@secjs/utils'
 import { RegisterENUM } from 'src/Enum/RegisterENUM'
+import { NotFoundDependencyException } from 'src/Exceptions/NotFoundDependencyException'
 import { DependencyAlreadyExistsException } from 'src/Exceptions/DependencyAlreadyExistsException'
 
 export class Ioc {
@@ -40,27 +40,45 @@ export class Ioc {
     return this
   }
 
-  list(alias: string | (string | GlobWithOptions)[]) {
-    return Ioc.container.loadModules(Is.String(alias) ? [alias] : alias)
-  }
-
   use<Dependency = any>(alias: string): Dependency {
-    return Ioc.container.resolve<Dependency>(alias)
+    if (!this.hasDependency(alias)) {
+      throw new NotFoundDependencyException(alias)
+    }
+
+    return Ioc.container.resolve<Dependency>(alias) as Dependency
   }
 
-  bind(alias: string, Dependency: any): void {
+  alias(alias: string, dependencyAlias: string): this {
+    this.verifyDependencyAlias(alias)
+
+    if (!this.hasDependency(dependencyAlias)) {
+      throw new NotFoundDependencyException(dependencyAlias)
+    }
+
+    Ioc.container.register(alias, aliasTo(dependencyAlias))
+
+    return this
+  }
+
+  bind(alias: string, Dependency: any): this {
     this.register(alias, Dependency, RegisterENUM.TRANSIENT)
+
+    return this
   }
 
-  scope(alias: string, Dependency: any): void {
+  scope(alias: string, Dependency: any): this {
     this.register(alias, Dependency, RegisterENUM.SCOPED)
+
+    return this
   }
 
-  singleton(alias: string, Dependency: any): void {
+  singleton(alias: string, Dependency: any): this {
     this.register(alias, Dependency, RegisterENUM.SINGLETON)
+
+    return this
   }
 
-  hasDependency(alias: string) {
+  hasDependency(alias: string): boolean {
     return Ioc.container.hasRegistration(alias)
   }
 
@@ -88,7 +106,7 @@ export class Ioc {
     if (alias.includes('/')) {
       const aliasOfAlias = alias.split('/').pop() as string
 
-      Ioc.container.register(String.toCamelCase(aliasOfAlias), aliasTo(alias))
+      this.alias(String.toCamelCase(aliasOfAlias), alias)
     }
   }
 
