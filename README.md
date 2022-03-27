@@ -1,6 +1,6 @@
 # IoC 📦
 
-> Simple IoC Container for Node.js
+> Global Ioc helper for Athenna ecosystem. Built on top of awilix
 
 [![GitHub followers](https://img.shields.io/github/followers/athennaio.svg?style=social&label=Follow&maxAge=2592000)](https://github.com/athennaio?tab=followers)
 [![GitHub stars](https://img.shields.io/github/stars/athennaio/ioc.svg?style=social&label=Star&maxAge=2592000)](https://github.com/athennaio/ioc/stargazers/)
