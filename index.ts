@@ -13,7 +13,7 @@ export {}
 
 declare global {
   const ioc: {
-    use: (alias: string) => any
+    use: <Dependency = any>(alias: string) => Dependency
   }
 }
 
@@ -22,7 +22,9 @@ const _global = global as any
 if (!_global.ioc) {
   _global.ioc = {}
 
-  _global.ioc.use = new Ioc().use
+  const ioc = new Ioc()
+
+  _global.ioc.use = ioc.safeUse.bind(ioc)
 }
 
 export * from 'src/Ioc'
