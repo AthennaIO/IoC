@@ -34,32 +34,27 @@ describe('\n IocTest', () => {
     expect(userService.find()).toHaveLength(3)
   })
 
-  it('should throw a dependency already exists exception', async () => {
+  it('should be able to override dependencies', async () => {
     ioc.singleton('Services/ClientService', ClientService)
     ioc.singleton('Services/UserService', UserService)
 
-    try {
-      ioc.singleton('Services/UserService', UserService)
-    } catch (error) {
-      expect(error.name).toBe('DependencyAlreadyExistsException')
-      expect(error.status).toBe(500)
-      expect(error.content).toBe(`The alias Services/UserService is already in use inside the container`)
-    }
+    ioc.singleton('Services/UserService', ClientService)
 
-    try {
-      ioc.singleton('userService', UserService)
-    } catch (error) {
-      expect(error.name).toBe('DependencyAlreadyExistsException')
-      expect(error.status).toBe(500)
-      expect(error.content).toBe(`The alias userService is already in use inside the container`)
-    }
+    {
+      const clientService = ioc.safeUse('userService')
 
-    try {
-      ioc.singleton('Addons/Services/UserService', UserService)
-    } catch (error) {
-      expect(error.name).toBe('DependencyAlreadyExistsException')
-      expect(error.status).toBe(500)
-      expect(error.content).toBe(`The alias userService is already in use inside the container`)
+      expect(clientService.find()).toStrictEqual([
+        { id: 1, name: 'LinkApi' },
+        { id: 2, name: 'Semantix' },
+      ])
+    }
+    {
+      const clientService = ioc.safeUse('Services/UserService')
+
+      expect(clientService.find()).toStrictEqual([
+        { id: 1, name: 'LinkApi' },
+        { id: 2, name: 'Semantix' },
+      ])
     }
   })
 

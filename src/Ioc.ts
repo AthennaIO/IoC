@@ -21,7 +21,6 @@ import {
 import { Is, String } from '@secjs/utils'
 import { RegisterENUM } from 'src/Enum/RegisterENUM'
 import { NotFoundDependencyException } from 'src/Exceptions/NotFoundDependencyException'
-import { DependencyAlreadyExistsException } from 'src/Exceptions/DependencyAlreadyExistsException'
 
 export class Ioc {
   private static container: AwilixContainer<any>
@@ -57,8 +56,6 @@ export class Ioc {
   }
 
   alias(alias: string, dependencyAlias: string): this {
-    this.verifyDependencyAlias(alias)
-
     if (!this.hasDependency(dependencyAlias)) {
       throw new NotFoundDependencyException(dependencyAlias)
     }
@@ -68,20 +65,20 @@ export class Ioc {
     return this
   }
 
-  bind(alias: string, Dependency: any): this {
-    this.register(alias, Dependency, RegisterENUM.TRANSIENT)
+  bind(alias: string, Dependency: any, createCamelAlias = true): this {
+    this.register(alias, Dependency, RegisterENUM.TRANSIENT, createCamelAlias)
 
     return this
   }
 
-  scope(alias: string, Dependency: any): this {
-    this.register(alias, Dependency, RegisterENUM.SCOPED)
+  scope(alias: string, Dependency: any, createCamelAlias = true): this {
+    this.register(alias, Dependency, RegisterENUM.SCOPED, createCamelAlias)
 
     return this
   }
 
-  singleton(alias: string, Dependency: any): this {
-    this.register(alias, Dependency, RegisterENUM.SINGLETON)
+  singleton(alias: string, Dependency: any, createCamelAlias = true): this {
+    this.register(alias, Dependency, RegisterENUM.SINGLETON, createCamelAlias)
 
     return this
   }
@@ -94,15 +91,8 @@ export class Ioc {
     alias: string,
     Dependency: any,
     registerType: RegisterENUM,
+    createCamelAlias = true,
   ): void {
-    this.verifyDependencyAlias(alias)
-
-    if (alias.includes('/')) {
-      const aliasOfAlias = alias.split('/').pop() as string
-
-      this.verifyDependencyAlias(aliasOfAlias)
-    }
-
     if (Is.Class(Dependency)) {
       Ioc.container.register(alias, asClass(Dependency)[registerType]())
     } else if (Is.Function(Dependency)) {
@@ -111,18 +101,10 @@ export class Ioc {
       Ioc.container.register(alias, asValue(Dependency))
     }
 
-    if (alias.includes('/')) {
+    if (alias.includes('/') && createCamelAlias) {
       const aliasOfAlias = alias.split('/').pop() as string
 
       this.alias(String.toCamelCase(aliasOfAlias), alias)
-    }
-  }
-
-  private verifyDependencyAlias(alias: string) {
-    const existDependency = this.hasDependency(alias)
-
-    if (existDependency) {
-      throw new DependencyAlreadyExistsException(alias)
     }
   }
 }
