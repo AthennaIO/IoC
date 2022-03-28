@@ -21,12 +21,12 @@ export abstract class ServiceProvider {
    *
    * Example: this.container.use('Addons/Database/DatabaseProvider') -> Instance
    */
-  abstract get boot()
+  abstract boot(): void | Promise<void>
 
   /**
    * Register method is called before main providers has been booted
    *
    * Example: this.container.use('Addons/Database/DatabaseProvider') -> undefined
    */
-  abstract get register()
+  abstract register(): void | Promise<void>
 }
