@@ -28,3 +28,4 @@ if (!_global.ioc) {
 }
 
 export * from 'src/Ioc'
+export * from 'src/Providers/ServiceProvider'
