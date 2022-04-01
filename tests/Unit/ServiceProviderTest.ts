@@ -15,8 +15,8 @@ describe('\n ServiceProviderTest', () => {
 
   beforeEach(() => (ioc = new Ioc().reconstruct()))
 
-  it('should be able to create custom service providers', async () => {
-    await new HelpersProvider().boot()
+  it('should be able to create custom service providers using default bindings attribute', async () => {
+    await new HelpersProvider().registerAttributes()
 
     expect(ioc.use('Helpers/NewStringHelper')).toBeTruthy()
   })
