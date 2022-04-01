@@ -9,24 +9,68 @@
 
 import { Ioc } from 'src/Ioc'
 
-export abstract class ServiceProvider {
-  protected container: Ioc
+export class ServiceProvider {
+  /**
+   * The ioc container instance
+   */
+  public container: Ioc
+
+  /**
+   * All the container bindings that should be registered.
+   */
+  public bindings?: Record<string, new (...args: any[]) => any>
+
+  /**
+   * All the container instances that should be registered.
+   */
+  public instances?: Record<string, any>
+
+  /**
+   * All the container singletons that should be registered.
+   */
+  public singletons?: Record<string, new (...args: any[]) => any>
 
   public constructor() {
     this.container = new Ioc()
   }
 
   /**
-   * Boot method is called after all main providers has been booted
+   * Register any application services.
    *
-   * Example: this.container.use('Addons/Database/DatabaseProvider') -> Instance
+   * @return void
    */
-  abstract boot(): void | Promise<void>
+  public register?(): void | Promise<void>
 
   /**
-   * Register method is called before main providers has been booted
+   * Bootstrap any application services.
    *
-   * Example: this.container.use('Addons/Database/DatabaseProvider') -> undefined
+   * @return void
    */
-  abstract register(): void | Promise<void>
+  public boot?(): void | Promise<void>
+
+  public registerAttributes(): this {
+    const bindings: any = this.bindings
+    const instances: any = this.instances
+    const singletons: any = this.singletons
+
+    if (bindings) {
+      Object.keys(bindings).forEach(alias => {
+        this.container.bind(alias, bindings[alias])
+      })
+    }
+
+    if (instances) {
+      Object.keys(instances).forEach(alias => {
+        this.container.instance(alias, instances[alias])
+      })
+    }
+
+    if (instances) {
+      Object.keys(singletons).forEach(alias => {
+        this.container.singleton(alias, singletons[alias])
+      })
+    }
+
+    return this
+  }
 }
