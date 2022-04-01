@@ -12,9 +12,7 @@ import { Ioc } from 'src/Ioc'
 export {}
 
 declare global {
-  const ioc: {
-    use: <Dependency = any>(alias: string) => Dependency
-  }
+  const ioc: Ioc
 }
 
 const _global = global as any
@@ -22,9 +20,7 @@ const _global = global as any
 if (!_global.ioc) {
   _global.ioc = {}
 
-  const ioc = new Ioc()
-
-  _global.ioc.use = ioc.safeUse.bind(ioc)
+  _global.ioc = new Ioc()
 }
 
 export * from 'src/Ioc'

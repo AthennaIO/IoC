@@ -65,20 +65,58 @@ export class Ioc {
     return this
   }
 
-  bind(alias: string, Dependency: any, createCamelAlias = true): this {
-    this.register(alias, Dependency, RegisterENUM.TRANSIENT, createCamelAlias)
+  bind(
+    alias: string,
+    Dependency: new (...args: any[]) => any,
+    createCamelAlias = true,
+  ): this {
+    this.registerByType(
+      alias,
+      Dependency,
+      RegisterENUM.TRANSIENT,
+      createCamelAlias,
+    )
 
     return this
   }
 
-  scope(alias: string, Dependency: any, createCamelAlias = true): this {
-    this.register(alias, Dependency, RegisterENUM.SCOPED, createCamelAlias)
+  instance(alias: string, Dependency: any, createCamelAlias = true): this {
+    this.registerByType(
+      alias,
+      Dependency,
+      RegisterENUM.SINGLETON,
+      createCamelAlias,
+    )
 
     return this
   }
 
-  singleton(alias: string, Dependency: any, createCamelAlias = true): this {
-    this.register(alias, Dependency, RegisterENUM.SINGLETON, createCamelAlias)
+  scope(
+    alias: string,
+    Dependency: new (...args: any[]) => any,
+    createCamelAlias = true,
+  ): this {
+    this.registerByType(
+      alias,
+      Dependency,
+      RegisterENUM.SCOPED,
+      createCamelAlias,
+    )
+
+    return this
+  }
+
+  singleton(
+    alias: string,
+    Dependency: new (...args: any[]) => any,
+    createCamelAlias = true,
+  ): this {
+    this.registerByType(
+      alias,
+      Dependency,
+      RegisterENUM.SINGLETON,
+      createCamelAlias,
+    )
 
     return this
   }
@@ -87,18 +125,58 @@ export class Ioc {
     return Ioc.container.hasRegistration(alias)
   }
 
-  private register(
+  private registerByType(
     alias: string,
     Dependency: any,
     registerType: RegisterENUM,
     createCamelAlias = true,
   ): void {
     if (Is.Class(Dependency)) {
-      Ioc.container.register(alias, asClass(Dependency)[registerType]())
-    } else if (Is.Function(Dependency)) {
-      Ioc.container.register(alias, asFunction(Dependency)[registerType]())
+      this.register(alias, Dependency, registerType, createCamelAlias, asClass)
+
+      return
+    }
+
+    if (Is.Function(Dependency)) {
+      this.register(
+        alias,
+        Dependency,
+        registerType,
+        createCamelAlias,
+        asFunction,
+      )
+
+      return
+    }
+
+    this.register(alias, Dependency, registerType, createCamelAlias, asValue)
+  }
+
+  private register(
+    alias: string,
+    Dependency: any,
+    registerType: RegisterENUM,
+    createCamelAlias = true,
+    binder: any,
+  ) {
+    if (Dependency.then) {
+      Dependency.then(realDependency => {
+        if (binder.name === 'asValue') {
+          Ioc.container.register(alias, binder(realDependency))
+
+          return
+        }
+
+        Ioc.container.register(alias, binder(realDependency)[registerType]())
+      })
     } else {
-      Ioc.container.register(alias, asValue(Dependency))
+      if (binder.name === 'asValue') {
+        Ioc.container.register(alias, binder(Dependency))
+
+        return
+      }
+
+      Ioc.container.register(alias, binder(Dependency)[registerType]())
     }
 
     if (alias.includes('/') && createCamelAlias) {
