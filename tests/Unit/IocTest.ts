@@ -10,6 +10,7 @@
 import { Ioc } from '../../src/Ioc'
 import { UserService } from '../Stubs/UserService'
 import { ClientService } from '../Stubs/ClientService'
+import { StringHelper } from '../Stubs/StringHelper'
 
 describe('\n IocTest', () => {
   let ioc = new Ioc()
@@ -17,8 +18,9 @@ describe('\n IocTest', () => {
   beforeEach(() => (ioc = new Ioc().reconstruct()))
 
   it('should be able to bind dependencies inside the container and use then', async () => {
-    ioc.singleton('Services/ClientService', ClientService)
     ioc.bind('Services/UserService', UserService)
+    ioc.singleton('Services/ClientService', ClientService)
+    ioc.instance('Helpers/StringHelper', new StringHelper())
 
     const userService = ioc.safeUse<UserService>('Services/UserService')
 
