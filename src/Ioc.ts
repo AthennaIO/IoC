@@ -23,6 +23,12 @@ import { RegisterENUM } from 'src/Enum/RegisterENUM'
 import { NotFoundDependencyException } from 'src/Exceptions/NotFoundDependencyException'
 
 export class Ioc {
+  private static mocks: {
+    alias: string
+    Dependency: any
+    createCamelAlias: boolean
+  }[] = []
+
   private static container: AwilixContainer<any>
 
   constructor(options?: ContainerOptions) {
@@ -87,6 +93,12 @@ export class Ioc {
       RegisterENUM.SINGLETON,
       createCamelAlias,
     )
+
+    return this
+  }
+
+  mock(alias: string, Dependency: any, createCamelAlias = true): this {
+    Ioc.mocks.push({ alias, Dependency, createCamelAlias })
 
     return this
   }
@@ -159,6 +171,13 @@ export class Ioc {
     createCamelAlias = true,
     binder: any,
   ) {
+    const mock = Ioc.mocks.find(mock => mock.alias === alias)
+
+    if (mock) {
+      Dependency = mock.Dependency
+      createCamelAlias = mock.createCamelAlias
+    }
+
     if (Dependency.then) {
       Dependency.then(realDependency => {
         if (binder.name === 'asValue') {
