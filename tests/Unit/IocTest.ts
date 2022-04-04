@@ -11,6 +11,7 @@ import { Ioc } from '../../src/Ioc'
 import { UserService } from '../Stubs/UserService'
 import { ClientService } from '../Stubs/ClientService'
 import { StringHelper } from '../Stubs/StringHelper'
+import { ClientServiceMock } from '../Stubs/ClientServiceMock'
 
 describe('\n IocTest', () => {
   let ioc = new Ioc()
@@ -98,5 +99,15 @@ describe('\n IocTest', () => {
         'The dependency alias Services/Aliases/ClientService has not been found inside the container',
       )
     }
+  })
+
+  it('should be able to create mock inside the container', async () => {
+    ioc.mock('Services/ClientService', ClientServiceMock)
+    ioc.singleton('Services/ClientService', ClientService)
+
+    const clientService = ioc.safeUse<ClientService>('Services/ClientService')
+
+    expect(clientService.find()).toHaveLength(2)
+    expect(clientService.find()[0]).toStrictEqual({ id: 1, name: 'Mock' })
   })
 })
