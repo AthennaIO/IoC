@@ -1,7 +1,6 @@
 {
   "name": "@athenna/ioc",
-  "version": "1.1.0",
-  "type": "module",
+  "version": "1.1.1",
   "description": "",
   "license": "MIT",
   "author": "João Lenon <lenon@athenna.io>",
@@ -78,8 +77,8 @@
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
-    "coverageDirectory": "./coverage",
     "preset": "ts-jest",
+    "coverageDirectory": "./tests/Coverage",
     "testEnvironment": "node"
   },
   "prettier": {
@@ -155,7 +154,7 @@
     }
   },
   "dependencies": {
-    "@secjs/utils": "1.7.8",
+    "@secjs/utils": "1.8.2",
     "awilix": "7.0.0",
     "reflect-metadata": "0.1.13",
     "tscpaths": "0.0.9"
