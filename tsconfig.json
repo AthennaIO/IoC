@@ -4,7 +4,7 @@
     "rootDir": ".",
     "baseUrl": ".",
     "target": "es2020",
-    "module": "commonjs",
+    "module": "esnext",
     "lib": ["es2020"],
     "moduleResolution": "node",
     "declaration": true,
