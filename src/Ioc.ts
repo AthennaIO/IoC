@@ -46,11 +46,9 @@ export class Ioc {
   }
 
   use<Dependency = any>(alias: string): Dependency | undefined {
-    try {
-      return Ioc.container.resolve<Dependency>(alias) as Dependency
-    } catch (error) {
-      return undefined
-    }
+    return Ioc.container.resolve<Dependency>(alias, {
+      allowUnregistered: true,
+    })
   }
 
   safeUse<Dependency = any>(alias: string): Dependency {
