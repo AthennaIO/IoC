@@ -65,7 +65,7 @@ export class ServiceProvider {
       })
     }
 
-    if (instances) {
+    if (singletons) {
       Object.keys(singletons).forEach(alias => {
         this.container.singleton(alias, singletons[alias])
       })
