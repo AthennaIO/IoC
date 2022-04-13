@@ -17,7 +17,7 @@ export class Facade {
   static container = new Ioc()
 
   /**
-   * Resolve the dependency from the container by the name
+   * Resolve the dependency from the container by the name.
    *
    * @param name
    */
@@ -30,7 +30,7 @@ export class Facade {
    *
    * @param alias
    */
-  static createFor<Provider = any>(alias: string): Provider {
+  static createFor<Provider = any>(alias: string): Provider & typeof Facade {
     return new Proxy(this, new FacadeProxyHandler(alias)) as any
   }
 }

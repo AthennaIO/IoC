@@ -46,6 +46,8 @@ export class FacadeProxyHandler {
    * @return {any}
    */
   private __callStatic(facade: typeof Facade, key: string) {
+    if (facade[key]) return facade[key]
+
     const provider = facade.getFacadeRoot(this.facadeAccessor)
 
     const apply = (method, _this, args) => method.bind(provider)(...args)
