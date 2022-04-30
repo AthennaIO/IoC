@@ -14,10 +14,8 @@ import { Ioc } from '#src/index'
 import { HelpersProvider } from '#tests/Stubs/HelpersProvider'
 
 test.group('ServiceProviderTest', group => {
-  let ioc = new Ioc()
-
   group.each.setup(() => {
-    ioc = new Ioc().reconstruct()
+    new Ioc().reconstruct()
   })
 
   test('should be able to execute boot and register methods', async ({ assert }) => {

@@ -16,10 +16,8 @@ import { ClientServiceMock } from '#tests/Stubs/ClientServiceMock'
 import { NotFoundDependencyException } from '#src/Exceptions/NotFoundDependencyException'
 
 test.group('IocTest', group => {
-  let ioc = new Ioc()
-
   group.each.setup(async () => {
-    ioc = new Ioc().reconstruct()
+    new Ioc().reconstruct()
   })
 
   test('should be able to bind dependencies inside the container and use then', async ({ assert }) => {
@@ -29,6 +27,16 @@ test.group('IocTest', group => {
     const userService = ioc.safeUse('Services/UserService')
 
     assert.lengthOf(userService.find(), 3)
+  })
+
+  test('should be able to list dependencies of the container', async ({ assert }) => {
+    ioc.bind('Services/UserService', UserService)
+    ioc.singleton('Services/ClientService', ClientService)
+
+    const dependencies = ioc.list()
+
+    assert.isObject(dependencies)
+    assert.lengthOf(Object.keys(dependencies), 4)
   })
 
   test('should create an alias for the alias', async ({ assert }) => {

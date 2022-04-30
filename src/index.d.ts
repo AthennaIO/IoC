@@ -163,3 +163,7 @@ export class Ioc {
    */
   hasDependency(alias: string): boolean;
 }
+
+declare global {
+  const ioc: Ioc
+}

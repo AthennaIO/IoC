@@ -13,11 +13,7 @@ import { Ioc, Facade } from '#src/index'
 import { SumService } from '#tests/Stubs/SumService'
 
 test.group('\n FacadeTest', group => {
-  let ioc = new Ioc()
-
   group.each.setup(() => {
-    ioc = new Ioc()
-
     ioc.bind('Athenna/Services/SumService', SumService)
   })
 

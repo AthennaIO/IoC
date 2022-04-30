@@ -109,6 +109,9 @@
       "es2021": true,
       "node": true
     },
+    "globals": {
+      "ioc": true
+    },
     "plugins": [
       "prettier"
     ],

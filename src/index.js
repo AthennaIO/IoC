@@ -65,6 +65,15 @@ export class Ioc {
   }
 
   /**
+   * List all bindings of the Ioc.
+   *
+   * @return {import('awilix').RegistrationHash}
+   */
+  list() {
+    return Ioc.container.registrations
+  }
+
+  /**
    * Resolve a service provider from the container or
    * returns undefined if not found.
    *
@@ -245,4 +254,8 @@ export class Ioc {
 
     register(dependency)
   }
+}
+
+if (!global.ioc) {
+  global.ioc = new Ioc()
 }
