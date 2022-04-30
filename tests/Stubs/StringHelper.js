@@ -8,6 +8,5 @@
  */
 
 export class StringHelper {
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  public constructor() {}
+  constructor() {}
 }
