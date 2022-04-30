@@ -7,8 +7,13 @@
  * file that was distributed with this source code.
  */
 
-export enum RegisterENUM {
-  SCOPED = 'scoped',
-  TRANSIENT = 'transient',
-  SINGLETON = 'singleton',
+export class ClientServiceMock {
+  #clients = [
+    { id: 1, name: 'Mock' },
+    { id: 2, name: 'Mock' },
+  ]
+
+  find() {
+    return this.#clients
+  }
 }

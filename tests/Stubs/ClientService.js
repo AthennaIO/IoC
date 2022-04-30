@@ -8,12 +8,12 @@
  */
 
 export class ClientService {
-  private clients = [
+  #clients = [
     { id: 1, name: 'LinkApi' },
     { id: 2, name: 'Semantix' },
   ]
 
   find() {
-    return this.clients
+    return this.#clients
   }
 }

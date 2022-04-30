@@ -20,13 +20,12 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-      - name: Transpile typescript to javascript
-        run: npm run build
       - name: Automatic GitHub Release
         uses: justincy/github-action-npm-release@2.0.1
         id: release
       - name: Publish to NPM Registry
         run: npm publish --access public
+        if: steps.release.outputs.released == 'true'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           name: Deploy
