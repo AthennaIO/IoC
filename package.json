@@ -6,7 +6,7 @@
   "author": "João Lenon <lenon@athenna.io>",
   "bugs": "https://github.com/AthennaIO/IoC/issues",
   "repository": "https://github.com/AthennaIO/IoC.git",
-  "homepage": "https://github.com/AthennaIO/Utils#readme",
+  "homepage": "https://github.com/AthennaIO/IoC#readme",
   "keywords": [],
   "scripts": {
     "lint:fix": "eslint \"{src,tests}/**/*.js\" --fix",
