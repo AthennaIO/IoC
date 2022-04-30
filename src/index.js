@@ -19,6 +19,7 @@ import {
 import { Is, Options, String } from '@secjs/utils'
 import { NotFoundDependencyException } from '#src/Exceptions/NotFoundDependencyException'
 
+export * from './Facades/Facade.js'
 export * from './Providers/ServiceProvider.js'
 
 export class Ioc {

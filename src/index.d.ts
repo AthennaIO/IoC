@@ -1,3 +1,23 @@
+export class Facade {
+  /**
+   * The container to resolve dependencies.
+   */
+  static container: any;
+  /**
+   * Resolve the dependency from the container by the name.
+   *
+   * @param {string} alias
+   */
+  static getFacadeRoot(alias: string): any;
+  /**
+   * Create a new Facade for the alias specified
+   *
+   * @param {string} alias
+   * @return {any}
+   */
+  static createFor(alias: string): any;
+}
+
 export class ServiceProvider {
   /**
    * All the container bindings that should be registered.

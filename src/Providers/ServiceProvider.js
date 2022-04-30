@@ -8,6 +8,7 @@
  */
 
 import { Ioc } from '#src/index'
+import { Exec } from '@secjs/utils'
 
 export class ServiceProvider {
   /**
@@ -62,15 +63,15 @@ export class ServiceProvider {
    */
   registerAttributes() {
     Object.keys(this.bindings).forEach(alias => {
-      this.container.bind(alias, this.bindings[alias])
+      this.container.bind(alias, Exec.getModule(this.bindings[alias]))
     })
 
     Object.keys(this.instances).forEach(alias => {
-      this.container.instance(alias, this.instances[alias])
+      this.container.instance(alias, Exec.getModule(this.instances[alias]))
     })
 
     Object.keys(this.singletons).forEach(alias => {
-      this.container.singleton(alias, this.singletons[alias])
+      this.container.singleton(alias, Exec.getModule(this.singletons[alias]))
     })
 
     return this
