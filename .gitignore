@@ -24,6 +24,7 @@ lib-cov
 
 # Coverage directory used by tools like istanbul
 coverage
+Coverage
 *.lcov
 
 # nyc test coverage
@@ -118,14 +119,9 @@ out
 .vscode
 
 # Environment variables file
+.env
 .env.testing
 .env.production
-
-# Build files
-*.js
-*.d.ts
-dist
-build
 
 # MacOS folder mapper file
 .DS_Store

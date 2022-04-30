@@ -8,31 +8,33 @@
  */
 
 import { Is } from '@secjs/utils'
-import { Facade } from 'src/Facades/Facade'
 
 export class FacadeProxyHandler {
   /**
    * The facade accessor that will be used to resolve the dependency.
+   *
+   * @type {string}
    */
-  private readonly facadeAccessor: string
+  #facadeAccessor
 
   /**
    * Creates a new instance of FacadeProxyHandler.
    *
+   * @param {string} facadeAccessor
    * @return {FacadeProxyHandler}
    */
-  public constructor(facadeAccessor: string) {
-    this.facadeAccessor = facadeAccessor
+  constructor(facadeAccessor) {
+    this.#facadeAccessor = facadeAccessor
   }
 
   /**
    * Method called by Proxy everytime a new property is called.
    *
-   * @param facade
-   * @param key
+   * @param {typeof import('Facade.js').Facade} facade
+   * @param {string} key
    * @return {any}
    */
-  get(facade: typeof Facade, key: string) {
+  get(facade, key) {
     return this.__callStatic(facade, key)
   }
 
@@ -41,12 +43,20 @@ export class FacadeProxyHandler {
    * This way we guarantee that we are working with
    * the same instance when a Facade method returns this.
    *
-   * @param facade
-   * @param key
+   * @param {typeof import('Facade.js').Facade} facade
+   * @param {string} key
    * @return {any}
    */
-  private __callStatic(facade: typeof Facade, key: string) {
-    const provider = facade.getFacadeRoot(this.facadeAccessor)
+  __callStatic(facade, key) {
+    /**
+     * Access methods from the Facade class instead of
+     * the provider.
+     */
+    if (facade[key]) {
+      return facade[key]
+    }
+
+    const provider = facade.getFacadeRoot(this.#facadeAccessor)
 
     const apply = (method, _this, args) => method.bind(provider)(...args)
 

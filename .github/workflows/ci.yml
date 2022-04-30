@@ -15,7 +15,7 @@ jobs:
       matrix:
         node-version:
           - 14.15.4
-          - 17.x
+          - 18.x
     steps:
       - uses: actions/checkout@v2
         with:
@@ -28,7 +28,7 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Run tests
-        run: npm run test
+        run: npm run test:coverage
 
   windows:
     runs-on: windows-latest
@@ -36,7 +36,7 @@ jobs:
       matrix:
         node-version:
           - 14.15.4
-          - 17.x
+          - 18.x
     steps:
       - uses: actions/checkout@v2
         with:
@@ -49,4 +49,4 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Run tests
-        run: npm run test
+        run: npm run test:coverage

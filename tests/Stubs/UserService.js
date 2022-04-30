@@ -8,15 +8,15 @@
  */
 
 export class UserService {
-  private users: any[] = [
+  #users = [
     { id: 1, name: 'João' },
     { id: 2, name: 'Victor' },
   ]
 
-  public constructor({ clientService }) {
-    this.users.push({ id: 3, name: 'Paulo' })
+  constructor(clientService) {
+    this.#users.push({ id: 3, name: 'Paulo' })
 
-    this.users = this.users.map(user => {
+    this.#users = this.#users.map(user => {
       user.clients = clientService.find()
 
       return user
@@ -24,6 +24,6 @@ export class UserService {
   }
 
   find() {
-    return this.users
+    return this.#users
   }
 }
