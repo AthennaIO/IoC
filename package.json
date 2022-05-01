@@ -1,13 +1,20 @@
 {
   "name": "@athennaio/ioc",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "Template for new projects.",
   "license": "MIT",
   "author": "João Lenon <lenon@athenna.io>",
   "bugs": "https://github.com/AthennaIO/IoC/issues",
   "repository": "https://github.com/AthennaIO/IoC.git",
   "homepage": "https://github.com/AthennaIO/IoC#readme",
-  "keywords": [],
+  "keywords": [
+    "ioc-container",
+    "service-provider",
+    "service-container",
+    "awilix",
+    "esm",
+    "athenna"
+  ],
   "scripts": {
     "lint:fix": "eslint \"{src,tests}/**/*.js\" --fix",
     "test": "npm run --silent lint:fix && node ./tests/index.js",
@@ -30,7 +37,7 @@
     "#tests/*": "./tests/*.js"
   },
   "dependencies": {
-    "@secjs/utils": "1.9.0",
+    "@secjs/utils": "1.9.1",
     "awilix": "7.0.2"
   },
   "devDependencies": {
