@@ -48,15 +48,15 @@ export class FacadeProxyHandler {
    * @return {any}
    */
   __callStatic(facade, key) {
+    const provider = facade.getFacadeRoot(this.#facadeAccessor)
+
     /**
      * Access methods from the Facade class instead of
      * the provider.
      */
-    if (facade[key]) {
+    if (facade[key] && !provider[key]) {
       return facade[key]
     }
-
-    const provider = facade.getFacadeRoot(this.#facadeAccessor)
 
     const apply = (method, _this, args) => method.bind(provider)(...args)
 
