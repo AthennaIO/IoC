@@ -24,10 +24,10 @@ export * from './Providers/ServiceProvider.js'
 
 export class Ioc {
   /**
-   * Dependencies that needs to be mocked when calling
-   * one of the registration methods.
+   * Hold all the dependencies that are mocked. The mocked
+   * dependencies will never be replaced if its alias exists here.
    *
-   * @type {{alias: string, dependency: any}[]}
+   * @type {string[]}
    */
   static mocks = []
 
@@ -59,6 +59,7 @@ export class Ioc {
   reconstruct(options) {
     options = Options.create(options, { injectionMode: InjectionMode.CLASSIC })
 
+    Ioc.mocks = []
     Ioc.container = createContainer(options)
 
     return this
@@ -146,14 +147,44 @@ export class Ioc {
   }
 
   /**
-   * Saves a mock to be used in the place of mock alias.
+   * Bind a mock dependency to the container.
    *
    * @param {string} alias
    * @param {any} dependency
+   * @param {boolean} [createCamelAlias]
    * @return {Ioc}
    */
-  mock(alias, dependency) {
-    Ioc.mocks.push({ alias, dependency })
+  mock(alias, dependency, createCamelAlias = true) {
+    this.#register(alias, dependency, { type: 'singleton', createCamelAlias })
+
+    Ioc.mocks.push(alias)
+
+    return this
+  }
+
+  /**
+   * Remove the mock from mocks property.
+   *
+   * @param {string} alias
+   * @return {Ioc}
+   */
+  unmock(alias) {
+    const index = Ioc.mocks.indexOf(alias)
+
+    if (index > -1) {
+      Ioc.mocks.splice(index, 1)
+    }
+
+    return this
+  }
+
+  /**
+   * Remove all mocks from mocks property.
+   *
+   * @return {Ioc}
+   */
+  clearAllMocks() {
+    Ioc.mocks = []
 
     return this
   }
@@ -203,20 +234,13 @@ export class Ioc {
   }
 
   /**
-   * Get the mocked dependency if it exists.
+   * Verify if alias is mocked.
    *
    * @param {string} alias
-   * @param {any} dependency
-   * @return {any}
+   * @return {boolean}
    */
-  #getMockIfExists(alias, dependency) {
-    const mock = Ioc.mocks.find(mock => mock.alias === alias)
-
-    if (!mock) {
-      return dependency
-    }
-
-    return mock.dependency
+  #isMocked(alias) {
+    return !!Ioc.mocks.find(mockAlias => alias === mockAlias)
   }
 
   /**
@@ -228,13 +252,20 @@ export class Ioc {
    * @return {void}
    */
   #register(alias, dependency, options) {
+    if (this.#isMocked(alias)) {
+      return
+    }
+
     options = Options.create(options, {
       type: 'transient',
       createCamelAlias: true,
     })
 
+    /**
+     * Saving the logic inside the function to reuse the code
+     * for promises and no promises dependencies.
+     */
     const register = dep => {
-      dep = this.#getMockIfExists(alias, dep)
       const binder = this.#getAwilixBinder(options.type, dep)
 
       Ioc.container.register(alias, binder)
