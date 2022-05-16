@@ -105,12 +105,23 @@ test.group('IocTest', group => {
 
   test('should be able to create mock inside the container', async ({ assert }) => {
     ioc.mock('Services/ClientService', ClientServiceMock)
-    ioc.singleton('Services/ClientService', ClientService)
+    ioc.singleton('Services/ClientService', ClientService) // This call will not replace ClientServiceMock.
 
     const clientService = ioc.safeUse('Services/ClientService')
 
     assert.lengthOf(clientService.find(), 2)
     assert.deepEqual(clientService.find()[0], { id: 1, name: 'Mock' })
+  })
+
+  test('should be able to clear the mocks from the container', async ({ assert }) => {
+    ioc.mock('Services/ClientService', ClientServiceMock)
+    ioc.unmock('Services/ClientService')
+    ioc.singleton('Services/ClientService', ClientService) // This call will replace ClientServiceMock.
+
+    const clientService = ioc.safeUse('Services/ClientService')
+
+    assert.lengthOf(clientService.find(), 2)
+    assert.deepEqual(clientService.find()[0], { id: 1, name: 'LinkApi' })
   })
 
   test('should throw a not found dependency exception when alias doesnt exist', async ({ assert }) => {
