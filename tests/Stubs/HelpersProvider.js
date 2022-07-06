@@ -10,16 +10,22 @@
 import { ServiceProvider } from '#src/index'
 
 export class HelpersProvider extends ServiceProvider {
-  singletons = {
-    'Helpers/ClientService': import('#tests/Stubs/ClientService'),
+  get singletons() {
+    return {
+      'Helpers/ClientService': import('#tests/Stubs/ClientService'),
+    }
   }
 
-  bindings = {
-    'Helpers/NewStringHelper': import('#tests/Stubs/StringHelper'),
+  get bindings() {
+    return {
+      'Helpers/NewStringHelper': import('#tests/Stubs/StringHelper'),
+    }
   }
 
-  instances = {
-    'Helpers/UserService': import('#tests/Stubs/UserService'),
+  get instances() {
+    return {
+      'Helpers/UserService': import('#tests/Stubs/UserService'),
+    }
   }
 
   register() {
