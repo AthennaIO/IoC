@@ -1,6 +1,6 @@
 {
   "name": "@athenna/ioc",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Global Ioc helper for Athenna ecosystem. Built on top of awilix.",
   "license": "MIT",
   "author": "João Lenon <lenon@athenna.io>",
@@ -37,7 +37,7 @@
     "#tests/*": "./tests/*.js"
   },
   "dependencies": {
-    "@secjs/utils": "1.9.4",
+    "@secjs/utils": "1.9.5",
     "awilix": "7.0.2"
   },
   "devDependencies": {

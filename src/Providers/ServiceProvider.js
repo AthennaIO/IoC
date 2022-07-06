@@ -8,29 +8,45 @@
  */
 
 import { Ioc } from '#src/index'
-import { Exec } from '@secjs/utils'
+import { Module } from '@secjs/utils'
 
 export class ServiceProvider {
+  /**
+   * Set where the type of application where this provider can
+   * be registered or not.
+   *
+   * @return {string[]}
+   */
+  get bootstrapIn() {
+    return ['*']
+  }
+
   /**
    * All the container bindings that should be registered.
    *
    * @type {Record<string, new (...args: any[]) => any>}
    */
-  bindings = {}
+  get bindings() {
+    return {}
+  }
 
   /**
    * All the container instances that should be registered.
    *
-   * @type {Record<string, any>}
+   * @return {Record<string, any>}
    */
-  instances = {}
+  get instances() {
+    return {}
+  }
 
   /**
    * All the container singletons that should be registered.
    *
-   * @type {Record<string, new (...args: any[]) => any>}
+   * @return {Record<string, new (...args: any[]) => any>}
    */
-  singletons = {}
+  get singletons() {
+    return {}
+  }
 
   constructor() {
     /**
@@ -46,14 +62,18 @@ export class ServiceProvider {
    *
    * @return {void|Promise<void>}
    */
-  async register() {}
+  async register() {
+    //
+  }
 
   /**
    * Bootstrap any application services.
    *
    * @return {void|Promise<void>}
    */
-  async boot() {}
+  async boot() {
+    //
+  }
 
   /**
    * Register all three attributes defined within
@@ -63,15 +83,15 @@ export class ServiceProvider {
    */
   registerAttributes() {
     Object.keys(this.bindings).forEach(alias => {
-      this.container.bind(alias, Exec.getModule(this.bindings[alias]))
+      this.container.bind(alias, Module.get(this.bindings[alias]))
     })
 
     Object.keys(this.instances).forEach(alias => {
-      this.container.instance(alias, Exec.getModule(this.instances[alias]))
+      this.container.instance(alias, Module.get(this.instances[alias]))
     })
 
     Object.keys(this.singletons).forEach(alias => {
-      this.container.singleton(alias, Exec.getModule(this.singletons[alias]))
+      this.container.singleton(alias, Module.get(this.singletons[alias]))
     })
 
     return this
