@@ -22,6 +22,14 @@ export class Facade {
 
 export class ServiceProvider {
   /**
+   * Set where the type of application where this provider can
+   * be registered or not.
+   *
+   * @return {string[]}
+   */
+  get bootstrapIn(): string[]
+
+  /**
    * All the container bindings that should be registered.
    *
    * @type {Record<string, new (...args: any[]) => any>}
