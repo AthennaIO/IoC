@@ -22,6 +22,14 @@ export class Facade {
 
 export class ServiceProvider {
   /**
+   * Set where the type of application where this provider can
+   * be registered or not.
+   *
+   * @return {string[]}
+   */
+  get bootstrapIn(): string[]
+
+  /**
    * All the container bindings that should be registered.
    *
    * @type {Record<string, new (...args: any[]) => any>}
@@ -100,6 +108,13 @@ export class Ioc {
    * @return {Ioc}
    */
   reconstruct(options?: import('awilix').ContainerOptions): Ioc;
+
+  /**
+   * List all bindings of the Ioc.
+   *
+   * @return {import('awilix').RegistrationHash}
+   */
+  list(): import('awilix').RegistrationHash
 
   /**
    * Resolve a service provider from the container or
