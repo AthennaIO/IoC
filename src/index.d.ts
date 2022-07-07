@@ -110,6 +110,13 @@ export class Ioc {
   reconstruct(options?: import('awilix').ContainerOptions): Ioc;
 
   /**
+   * List all bindings of the Ioc.
+   *
+   * @return {import('awilix').RegistrationHash}
+   */
+  list(): import('awilix').RegistrationHash
+
+  /**
    * Resolve a service provider from the container or
    * returns undefined if not found.
    *
