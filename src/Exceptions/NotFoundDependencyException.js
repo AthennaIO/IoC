@@ -22,7 +22,7 @@ export class NotFoundDependencyException extends Exception {
     super(
       content,
       500,
-      'E_NOT_FOUND_DEPENDENCY',
+      'E_NOT_FOUND_DEPENDENCY_ERROR',
       `First you need to bind your ${alias} inside the container using the ioc.bind or ioc.singleton methods. Then execute the ioc.list method to verify that your dependency is registered inside the container.`,
     )
   }
