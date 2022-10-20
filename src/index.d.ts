@@ -1,3 +1,12 @@
+/**
+ * @athenna/ioc
+ *
+ * (c) João Lenon <lenon@athenna.io>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 export class Facade {
   /**
    * The container to resolve dependencies.
@@ -9,7 +18,7 @@ export class Facade {
    *
    * @param {string} alias
    */
-  static getFacadeRoot(alias: string): any;
+  static getFacadeRoot(alias: string): any
 
   /**
    * Create a new Facade for the alias specified
@@ -17,18 +26,10 @@ export class Facade {
    * @param {string} alias
    * @return {any}
    */
-  static createFor(alias: string): any;
+  static createFor(alias: string): any
 }
 
 export class ServiceProvider {
-  /**
-   * Set where the type of application where this provider can
-   * be registered or not.
-   *
-   * @return {string[]}
-   */
-  get bootstrapIn(): string[]
-
   /**
    * All the container bindings that should be registered.
    *
@@ -55,18 +56,26 @@ export class ServiceProvider {
   container: Ioc
 
   /**
+   * Set where the type of application where this provider can
+   * be registered or not.
+   *
+   * @return {string[]}
+   */
+  get bootstrapIn(): string[]
+
+  /**
    * Register any application services.
    *
    * @return {void|Promise<void>}
    */
-  register(): void | Promise<void>;
+  register(): void | Promise<void>
 
   /**
    * Bootstrap any application services.
    *
    * @return {void|Promise<void>}
    */
-  boot(): void | Promise<void>;
+  boot(): void | Promise<void>
 
   /**
    * Register all three attributes defined within
@@ -74,7 +83,7 @@ export class ServiceProvider {
    *
    * @return {this}
    */
-  registerAttributes(): this;
+  registerAttributes(): this
 }
 
 export class Ioc {
@@ -99,7 +108,7 @@ export class Ioc {
    * @param {import('awilix').ContainerOptions} [options]
    * @return {Ioc}
    */
-  constructor(options?: import('awilix').ContainerOptions);
+  constructor(options?: import('awilix').ContainerOptions)
 
   /**
    * Reconstruct the awilix container and mocks.
@@ -107,7 +116,7 @@ export class Ioc {
    * @param {import('awilix').ContainerOptions} [options]
    * @return {Ioc}
    */
-  reconstruct(options?: import('awilix').ContainerOptions): Ioc;
+  reconstruct(options?: import('awilix').ContainerOptions): Ioc
 
   /**
    * List all bindings of the Ioc.
@@ -123,7 +132,7 @@ export class Ioc {
    * @param {string} alias
    * @return {any|undefined}
    */
-  use(alias: string): any | undefined;
+  use(alias: string): any | undefined
 
   /**
    * Resolve a service provider from the container or
@@ -132,7 +141,7 @@ export class Ioc {
    * @param {string} alias
    * @return {any}
    */
-  safeUse(alias: string): any;
+  safeUse(alias: string): any
 
   /**
    * Register and alias to other dependency alias of the
@@ -142,7 +151,7 @@ export class Ioc {
    * @param {string} dependencyAlias
    * @return {Ioc}
    */
-  alias(alias: string, dependencyAlias: string): Ioc;
+  alias(alias: string, dependencyAlias: string): Ioc
 
   /**
    * Bind a transient dependency to the container.
@@ -152,7 +161,7 @@ export class Ioc {
    * @param {boolean} [createCamelAlias]
    * @return {Ioc}
    */
-  bind(alias: string, dependency: any, createCamelAlias?: boolean): Ioc;
+  bind(alias: string, dependency: any, createCamelAlias?: boolean): Ioc
 
   /**
    * Bind an instance dependency to the container.
@@ -162,7 +171,7 @@ export class Ioc {
    * @param {boolean} [createCamelAlias]
    * @return {Ioc}
    */
-  instance(alias: string, dependency: any, createCamelAlias?: boolean): Ioc;
+  instance(alias: string, dependency: any, createCamelAlias?: boolean): Ioc
 
   /**
    * Bind a mocked dependency to the container.
@@ -172,7 +181,7 @@ export class Ioc {
    * @param {boolean} [createCamelAlias]
    * @return {Ioc}
    */
-  mock(alias: string, dependency: any, createCamelAlias?: boolean): Ioc;
+  mock(alias: string, dependency: any, createCamelAlias?: boolean): Ioc
 
   /**
    * Remove the mock from mocks property.
@@ -180,14 +189,14 @@ export class Ioc {
    * @param {string} alias
    * @return {Ioc}
    */
-  unmock(alias: string): Ioc;
+  unmock(alias: string): Ioc
 
   /**
    * Remove all mocks from mocks property.
    *
    * @return {Ioc}
    */
-  clearAllMocks(): Ioc;
+  clearAllMocks(): Ioc
 
   /**
    * Bind a singleton dependency to the container.
@@ -197,7 +206,7 @@ export class Ioc {
    * @param {boolean} [createCamelAlias]
    * @return {Ioc}
    */
-  singleton(alias: string, dependency: any, createCamelAlias?: boolean): Ioc;
+  singleton(alias: string, dependency: any, createCamelAlias?: boolean): Ioc
 
   /**
    * Verify if the container has the dependency or not.
@@ -205,7 +214,7 @@ export class Ioc {
    * @param {string} alias
    * @return {boolean}
    */
-  hasDependency(alias: string): boolean;
+  hasDependency(alias: string): boolean
 }
 
 declare global {

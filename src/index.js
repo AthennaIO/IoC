@@ -16,7 +16,7 @@ import {
   InjectionMode,
 } from 'awilix'
 
-import { Is, Options, String } from '@secjs/utils'
+import { Is, Options, String } from '@athenna/common'
 import { NotFoundDependencyException } from '#src/Exceptions/NotFoundDependencyException'
 
 export * from './Facades/Facade.js'

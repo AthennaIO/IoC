@@ -8,7 +8,7 @@
  */
 
 import { test } from '@japa/runner'
-import { Exec } from '@secjs/utils'
+import { Exec } from '@athenna/common'
 
 import { Ioc } from '#src/index'
 import { HelpersProvider } from '#tests/Stubs/HelpersProvider'
