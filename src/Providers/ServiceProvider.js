@@ -8,9 +8,18 @@
  */
 
 import { Ioc } from '#src/index'
-import { Module } from '@secjs/utils'
+import { Module } from '@athenna/common'
 
 export class ServiceProvider {
+  constructor() {
+    /**
+     * The ioc container instance
+     *
+     * @type {Ioc}
+     */
+    this.container = new Ioc()
+  }
+
   /**
    * Set where the type of application where this provider can
    * be registered or not.
@@ -46,15 +55,6 @@ export class ServiceProvider {
    */
   get singletons() {
     return {}
-  }
-
-  constructor() {
-    /**
-     * The ioc container instance
-     *
-     * @type {Ioc}
-     */
-    this.container = new Ioc()
   }
 
   /**
