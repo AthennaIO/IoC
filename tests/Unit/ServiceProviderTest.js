@@ -18,7 +18,7 @@ test.group('ServiceProviderTest', group => {
     new Ioc().reconstruct()
   })
 
-  test('should be able to execute boot and register methods', async ({ assert }) => {
+  test('should be able to execute boot, register and shutdown methods', async ({ assert }) => {
     new HelpersProvider().register()
 
     assert.isDefined(ioc.use('Helpers/StringFn'))
@@ -26,6 +26,11 @@ test.group('ServiceProviderTest', group => {
     new HelpersProvider().boot()
 
     assert.isDefined(ioc.use('Helpers/NumberFn'))
+
+    new HelpersProvider().shutdown()
+
+    assert.isNull(ioc.use('Helpers/StringFn'))
+    assert.isNull(ioc.use('Helpers/NumberFn'))
   })
 
   test('should be able to create custom service providers using default bindings attribute', async ({ assert }) => {

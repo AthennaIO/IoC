@@ -78,6 +78,13 @@ export class ServiceProvider {
   boot(): void | Promise<void>
 
   /**
+   * Shutdown any application services.
+   *
+   * @return {void|Promise<void>}
+   */
+  shutdown(): void | Promise<void>
+
+  /**
    * Register all three attributes defined within
    * ServiceProvider.
    *

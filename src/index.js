@@ -277,7 +277,7 @@ export class Ioc {
       }
     }
 
-    if (dependency.then) {
+    if (dependency && dependency.then) {
       dependency.then(dep => register(dep))
 
       return

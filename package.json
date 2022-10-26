@@ -1,6 +1,6 @@
 {
   "name": "@athenna/ioc",
-  "version": "1.2.7",
+  "version": "1.2.8",
   "description": "Global Ioc helper for Athenna ecosystem. Built on top of awilix.",
   "license": "MIT",
   "author": "João Lenon <lenon@athenna.io>",
