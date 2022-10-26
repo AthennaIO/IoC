@@ -35,4 +35,9 @@ export class HelpersProvider extends ServiceProvider {
   boot() {
     this.container.instance('Helpers/NumberFn', () => 'NumberFn')
   }
+
+  shutdown() {
+    this.container.instance('Helpers/StringFn', null)
+    this.container.instance('Helpers/NumberFn', null)
+  }
 }

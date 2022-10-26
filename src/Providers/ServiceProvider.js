@@ -76,6 +76,15 @@ export class ServiceProvider {
   }
 
   /**
+   * Shutdown any application services.
+   *
+   * @return {void|Promise<void>}
+   */
+  async shutdown() {
+    //
+  }
+
+  /**
    * Register all three attributes defined within
    * ServiceProvider.
    *
