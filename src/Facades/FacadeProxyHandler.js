@@ -30,7 +30,7 @@ export class FacadeProxyHandler {
   /**
    * Method called by Proxy everytime a new property is called.
    *
-   * @param {typeof import('Facade.js').Facade} facade
+   * @param {typeof import('#src/Facades/Facade').Facade} facade
    * @param {string} key
    * @return {any}
    */
@@ -43,19 +43,27 @@ export class FacadeProxyHandler {
    * This way we guarantee that we are working with
    * the same instance when a Facade method returns this.
    *
-   * @param {typeof import('Facade.js').Facade} facade
+   * @param {typeof import('#src/Facades/Facade').Facade} Facade
    * @param {string} key
    * @return {any}
    */
-  __callStatic(facade, key) {
-    const provider = facade.getFacadeRoot(this.#facadeAccessor)
+  __callStatic(Facade, key) {
+    const provider = Facade.getFacadeRoot(this.#facadeAccessor)
+    const facadeMethods = new Facade(this.#facadeAccessor, provider.constructor)
+
+    /**
+     * Execute the facade methods like __mock.
+     */
+    if (facadeMethods[key]) {
+      return facadeMethods[key]
+    }
 
     /**
      * Access methods from the Facade class instead of
      * the provider.
      */
-    if (facade[key] && !provider[key]) {
-      return facade[key]
+    if (Facade[key] && !provider[key]) {
+      return Facade[key]
     }
 
     const apply = (method, _this, args) => method.bind(provider)(...args)
