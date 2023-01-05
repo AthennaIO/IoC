@@ -27,6 +27,23 @@ export class Facade {
    * @return {any}
    */
   static createFor(alias: string): any
+
+  /**
+   * Mock a method of the dependency inside the container.
+   *
+   * @param {string} method
+   * @param {any} returnValue
+   * @return {void}
+   */
+  static __mock(method: string, returnValue: any): void
+
+  /**
+   * Restore the provider default method.
+   *
+   * @param {string} method
+   * @return {void}
+   */
+  static __restore(method: string): void
 }
 
 export class ServiceProvider {

@@ -9,7 +9,7 @@
 
 import { test } from '@japa/runner'
 
-import { Ioc, Facade } from '#src/index'
+import { Facade, Ioc } from '#src/index'
 import { SumService } from '#tests/Stubs/SumService'
 
 test.group('\n FacadeTest', group => {
@@ -51,5 +51,20 @@ test.group('\n FacadeTest', group => {
     const Sum = Facade.createFor('Athenna/Services/SumService')
 
     assert.isUndefined(Sum.value)
+  })
+
+  test('should be able to mock and restore facade methods', async ({ assert }) => {
+    /** @type {SumService & typeof Facade} */
+    const Sum = Facade.createFor('Athenna/Services/SumService')
+
+    Sum.__mock('get', function () {
+      return this.number + 2
+    })
+
+    assert.deepEqual(Sum.set(10).get(), 12)
+
+    Sum.__restore('get')
+
+    assert.deepEqual(Sum.set(10).get(), 10)
   })
 })
