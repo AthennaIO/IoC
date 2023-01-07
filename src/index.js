@@ -17,6 +17,7 @@ import {
 } from 'awilix'
 
 import { Is, Options, String } from '@athenna/common'
+import { ProviderFaker } from '#src/Helpers/ProviderFaker'
 import { NotFoundDependencyException } from '#src/Exceptions/NotFoundDependencyException'
 
 export * from './Facades/Facade.js'
@@ -24,12 +25,12 @@ export * from './Providers/ServiceProvider.js'
 
 export class Ioc {
   /**
-   * Hold all the dependencies that are mocked. The mocked
+   * Hold all the dependencies that are fakes. The fake
    * dependencies will never be replaced if its alias exists here.
    *
    * @type {string[]}
    */
-  static mocks = []
+  static fakes = []
 
   /**
    * The awilix container instance.
@@ -59,7 +60,7 @@ export class Ioc {
   reconstruct(options) {
     options = Options.create(options, { injectionMode: InjectionMode.CLASSIC })
 
-    Ioc.mocks = []
+    Ioc.fakes = []
     Ioc.container = createContainer(options)
 
     return this
@@ -72,6 +73,27 @@ export class Ioc {
    */
   list() {
     return Ioc.container.registrations
+  }
+
+  /**
+   * Return the registration of the dependency.
+   *
+   * @return {import('awilix').Resolver<any> & { hasCamelAlias: boolean }}
+   */
+  getRegistration(alias) {
+    const registration = Ioc.container.getRegistration(alias)
+
+    registration.hasCamelAlias = false
+
+    if (alias.includes('/')) {
+      const aliasOfAlias = alias.split('/').pop()
+
+      if (Ioc.container.hasRegistration(String.toCamelCase(aliasOfAlias))) {
+        registration.hasCamelAlias = true
+      }
+    }
+
+    return registration
   }
 
   /**
@@ -133,6 +155,20 @@ export class Ioc {
   }
 
   /**
+   * Bind a scoped dependency to the container.
+   *
+   * @param {string} alias
+   * @param {any} dependency
+   * @param {boolean} [createCamelAlias]
+   * @return {Ioc}
+   */
+  scoped(alias, dependency, createCamelAlias = true) {
+    this.#register(alias, dependency, { type: 'scoped', createCamelAlias })
+
+    return this
+  }
+
+  /**
    * Bind an instance dependency to the container.
    *
    * @param {string} alias
@@ -147,49 +183,6 @@ export class Ioc {
   }
 
   /**
-   * Bind a mock dependency to the container.
-   *
-   * @param {string} alias
-   * @param {any} dependency
-   * @param {boolean} [createCamelAlias]
-   * @return {Ioc}
-   */
-  mock(alias, dependency, createCamelAlias = true) {
-    this.#register(alias, dependency, { type: 'singleton', createCamelAlias })
-
-    Ioc.mocks.push(alias)
-
-    return this
-  }
-
-  /**
-   * Remove the mock from mocks property.
-   *
-   * @param {string} alias
-   * @return {Ioc}
-   */
-  unmock(alias) {
-    const index = Ioc.mocks.indexOf(alias)
-
-    if (index > -1) {
-      Ioc.mocks.splice(index, 1)
-    }
-
-    return this
-  }
-
-  /**
-   * Remove all mocks from mocks property.
-   *
-   * @return {Ioc}
-   */
-  clearAllMocks() {
-    Ioc.mocks = []
-
-    return this
-  }
-
-  /**
    * Bind a singleton dependency to the container.
    *
    * @param {string} alias
@@ -199,6 +192,97 @@ export class Ioc {
    */
   singleton(alias, dependency, createCamelAlias = true) {
     this.#register(alias, dependency, { type: 'singleton', createCamelAlias })
+
+    return this
+  }
+
+  /**
+   * Bind a fake dependency to the container.
+   *
+   * @param {string} alias
+   * @param {any} dependency
+   * @param {boolean} [createCamelAlias]
+   * @return {Ioc}
+   */
+  fake(alias, dependency, createCamelAlias = true) {
+    this.#register(alias, dependency, { type: 'singleton', createCamelAlias })
+
+    Ioc.fakes.push(alias)
+
+    return this
+  }
+
+  /**
+   * Remove the fake dependency from fakes map.
+   *
+   * @param {string} alias
+   * @return {Ioc}
+   */
+  unfake(alias) {
+    const index = Ioc.fakes.indexOf(alias)
+
+    if (index > -1) {
+      Ioc.fakes.splice(index, 1)
+    }
+
+    return this
+  }
+
+  /**
+   * Remove all fake dependencies from fakes map.
+   *
+   * @return {Ioc}
+   */
+  clearAllFakes() {
+    Ioc.fakes = []
+
+    return this
+  }
+
+  /**
+   * Verify if dependency alias is fake or not.
+   *
+   * @return {boolean}
+   */
+  isFaked(alias) {
+    return Ioc.fakes.includes(alias)
+  }
+
+  /**
+   * Register a fake method to the dependency.
+   *
+   * @param {string} alias
+   * @param {string} method
+   * @param {any} returnValue
+   * @return {Ioc}
+   */
+  fakeMethod(alias, method, returnValue) {
+    ProviderFaker.fakeMethod(alias, method, returnValue)
+
+    return this
+  }
+
+  /**
+   * Restore the dependency method to the default state.
+   *
+   * @param {string} alias
+   * @param {string} method
+   * @return {Ioc}
+   */
+  restoreMethod(alias, method) {
+    ProviderFaker.restoreMethod(alias, method)
+
+    return this
+  }
+
+  /**
+   * Restore all the dependency methods to the default state.
+   *
+   * @param {string} alias
+   * @return {Ioc}
+   */
+  restoreAllMethods(alias) {
+    ProviderFaker.restoreAllMethods(alias)
 
     return this
   }
@@ -234,16 +318,6 @@ export class Ioc {
   }
 
   /**
-   * Verify if alias is mocked.
-   *
-   * @param {string} alias
-   * @return {boolean}
-   */
-  #isMocked(alias) {
-    return !!Ioc.mocks.find(mockAlias => alias === mockAlias)
-  }
-
-  /**
    * Register the binder in the Awilix container.
    *
    * @param {string} alias
@@ -252,7 +326,7 @@ export class Ioc {
    * @return {void}
    */
   #register(alias, dependency, options) {
-    if (this.#isMocked(alias)) {
+    if (this.isFaked(alias)) {
       return
     }
 
