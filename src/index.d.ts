@@ -7,43 +7,77 @@
  * file that was distributed with this source code.
  */
 
+import { SinonMock } from 'sinon'
+
 export class Facade {
   /**
    * The container to resolve dependencies.
+   *
+   * @type {Ioc}
    */
-  static container: any
+  static container: Ioc
 
   /**
-   * Resolve the dependency from the container by the name.
+   * Set the container if it does not exist.
    *
-   * @param {string} alias
+   * @return {typeof Facade}
    */
-  static getFacadeRoot(alias: string): any
+  static setContainer(): typeof Facade
 
   /**
    * Create a new Facade for the alias specified
    *
    * @param {string} alias
+   * @return {typeof Facade}
+   */
+  static createFor(alias: string): typeof Facade
+
+  /**
+   * Get the facade alias registered to resolve deps
+   * from the Ioc.
+   *
+   * @return {string}
+   */
+  static getFacadeAlias(): string
+
+  /**
+   * Get the facade provider resolved from the Ioc.
+   *
    * @return {any}
    */
-  static createFor(alias: string): any
+  static getFacadeProvider(): any
 
   /**
-   * Mock a method of the dependency inside the container.
+   * Set a fake return value in the Facade method.
    *
-   * @param {string} method
-   * @param {any} returnValue
-   * @return {void}
+   * @param method {string}
+   * @param returnValue {any}
+   * @return {typeof Facade}
    */
-  static __mock(method: string, returnValue: any): void
+  static fakeMethod(method: string, returnValue: any): typeof Facade
 
   /**
-   * Restore the provider default method.
+   * Restore the mocked method to his default state.
    *
-   * @param {string} method
-   * @return {void}
+   * @param method {string}
+   * @return {typeof Facade}
    */
-  static __restore(method: string): void
+  static restoreMethod(method: string): typeof Facade
+
+  /**
+   * Restore all the mocked methods of this facade to
+   * their default state.
+   *
+   * @return {typeof Facade}
+   */
+  static restoreAllMethods(): typeof Facade
+
+  /**
+   * Return a sinon mock instance of the Facade.
+   *
+   * @return {SinonMock}
+   */
+  static getMock(): SinonMock
 }
 
 export class ServiceProvider {
@@ -117,7 +151,7 @@ export class Ioc {
    *
    * @type {string[]}
    */
-  static mocks: string[]
+  static fakes: string[]
 
   /**
    * The awilix container instance.
@@ -148,6 +182,13 @@ export class Ioc {
    * @return {import('awilix').RegistrationHash}
    */
   list(): import('awilix').RegistrationHash
+
+  /**
+   * Return the registration of the dependency.
+   *
+   * @return {import('awilix').Resolver<any> & { hasCamelAlias: boolean }}
+   */
+  getRegistration(alias: string): import('awilix').Resolver<any> & { hasCamelAlias: boolean }
 
   /**
    * Resolve a service provider from the container or
@@ -188,6 +229,16 @@ export class Ioc {
   bind(alias: string, dependency: any, createCamelAlias?: boolean): Ioc
 
   /**
+   * Bind a scoped dependency to the container.
+   *
+   * @param {string} alias
+   * @param {any} dependency
+   * @param {boolean} [createCamelAlias]
+   * @return {Ioc}
+   */
+  scoped(alias: string, dependency: any, createCamelAlias?: boolean): Ioc
+
+  /**
    * Bind an instance dependency to the container.
    *
    * @param {string} alias
@@ -198,31 +249,6 @@ export class Ioc {
   instance(alias: string, dependency: any, createCamelAlias?: boolean): Ioc
 
   /**
-   * Bind a mocked dependency to the container.
-   *
-   * @param {string} alias
-   * @param {any} dependency
-   * @param {boolean} [createCamelAlias]
-   * @return {Ioc}
-   */
-  mock(alias: string, dependency: any, createCamelAlias?: boolean): Ioc
-
-  /**
-   * Remove the mock from mocks property.
-   *
-   * @param {string} alias
-   * @return {Ioc}
-   */
-  unmock(alias: string): Ioc
-
-  /**
-   * Remove all mocks from mocks property.
-   *
-   * @return {Ioc}
-   */
-  clearAllMocks(): Ioc
-
-  /**
    * Bind a singleton dependency to the container.
    *
    * @param {string} alias
@@ -231,6 +257,65 @@ export class Ioc {
    * @return {Ioc}
    */
   singleton(alias: string, dependency: any, createCamelAlias?: boolean): Ioc
+
+  /**
+   * Bind a fake dependency to the container.
+   *
+   * @param {string} alias
+   * @param {any} dependency
+   * @param {boolean} [createCamelAlias]
+   * @return {Ioc}
+   */
+  fake(alias: string, dependency: any, createCamelAlias?: boolean): Ioc
+
+  /**
+   * Remove the fake dependency from fakes map.
+   *
+   * @param {string} alias
+   * @return {Ioc}
+   */
+  unfake(alias: string): Ioc
+
+  /**
+   * Remove all fake dependencies from fakes map.
+   *
+   * @return {Ioc}
+   */
+  clearAllFakes(): Ioc
+
+  /**
+   * Verify if dependency alias is fake or not.
+   *
+   * @return {boolean}
+   */
+  isFaked(alias: string): boolean
+
+  /**
+   * Register a fake method to the dependency.
+   *
+   * @param {string} alias
+   * @param {string} method
+   * @param {any} returnValue
+   * @return {Ioc}
+   */
+  fakeMethod(alias: string, method: string, returnValue: any): Ioc
+
+  /**
+   * Restore the dependency method to the default state.
+   *
+   * @param {string} alias
+   * @param {string} method
+   * @return {Ioc}
+   */
+  restoreMethod(alias: string, method: string): Ioc
+
+  /**
+   * Restore all the dependency methods to the default state.
+   *
+   * @param {string} alias
+   * @return {Ioc}
+   */
+  restoreAllMethods(alias: string): Ioc
 
   /**
    * Verify if the container has the dependency or not.

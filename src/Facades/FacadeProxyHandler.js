@@ -8,34 +8,117 @@
  */
 
 import { Is } from '@athenna/common'
+import { createRequire } from 'node:module'
+import { PROTECTED_FACADE_METHODS } from '#src/Constants/ProtectedFacadeMethods'
+
+const require = createRequire(import.meta.url)
 
 export class FacadeProxyHandler {
   /**
-   * The facade accessor that will be used to resolve the dependency.
-   *
-   * @type {string}
-   */
-  #facadeAccessor
-
-  /**
    * Creates a new instance of FacadeProxyHandler.
    *
+   * @param {Ioc} container
    * @param {string} facadeAccessor
-   * @return {FacadeProxyHandler}
    */
-  constructor(facadeAccessor) {
-    this.#facadeAccessor = facadeAccessor
+  constructor(container, facadeAccessor) {
+    this.container = container
+    this.facadeAccessor = facadeAccessor
+  }
+
+  /**
+   * Get the facade alias registered to resolve deps
+   * from the Ioc.
+   *
+   * @return {string}
+   */
+  getFacadeAlias() {
+    return this.facadeAccessor
+  }
+
+  /**
+   * Get the facade provider resolved from the Ioc.
+   *
+   * @return {any}
+   */
+  getFacadeProvider() {
+    return this.container.safeUse(this.facadeAccessor)
+  }
+
+  /**
+   * Set a fake return value in the Facade method.
+   *
+   * @param method {string}
+   * @param returnValue {any}
+   * @return {typeof Facade}
+   */
+  fakeMethod(method, returnValue) {
+    this.container.fakeMethod(this.facadeAccessor, method, returnValue)
+
+    return this
+  }
+
+  /**
+   * Restore the mocked method to his default state.
+   *
+   * @param method {string}
+   * @return {typeof Facade}
+   */
+  restoreMethod(method) {
+    this.container.restoreMethod(this.facadeAccessor, method)
+
+    return this
+  }
+
+  /**
+   * Restore all the mocked methods of this facade to
+   * their default state.
+   *
+   * @return {typeof Facade}
+   */
+  restoreAllMethods() {
+    this.container.restoreAllMethods(this.facadeAccessor)
+
+    return this
+  }
+
+  /**
+   * Return a sinon mock instance.
+   *
+   * @return {any}
+   */
+  getMock() {
+    const sinon = require('sinon')
+
+    this.mockedProvider = this.getFacadeProvider()
+
+    return new Proxy(sinon.mock(this.mockedProvider), {
+      get: (mock, method) => {
+        if (method === 'verify') {
+          this.mockedProvider = null
+        }
+
+        return mock[method]
+      },
+    })
   }
 
   /**
    * Method called by Proxy everytime a new property is called.
    *
-   * @param {typeof import('#src/Facades/Facade').Facade} facade
+   * @param {typeof import('#src/Facades/Facade').Facade} Facade
    * @param {string} key
    * @return {any}
    */
-  get(facade, key) {
-    return this.__callStatic(facade, key)
+  get(Facade, key) {
+    if (PROTECTED_FACADE_METHODS.includes(key)) {
+      return this[key].bind(this)
+    }
+
+    if (this.mockedProvider) {
+      return this.mockedProvider[key]
+    }
+
+    return this.__callStatic(Facade, key)
   }
 
   /**
@@ -48,23 +131,7 @@ export class FacadeProxyHandler {
    * @return {any}
    */
   __callStatic(Facade, key) {
-    const provider = Facade.getFacadeRoot(this.#facadeAccessor)
-    const facadeMethods = new Facade(this.#facadeAccessor, provider.constructor)
-
-    /**
-     * Execute the facade methods like __mock.
-     */
-    if (facadeMethods[key]) {
-      return facadeMethods[key]
-    }
-
-    /**
-     * Access methods from the Facade class instead of
-     * the provider.
-     */
-    if (Facade[key] && !provider[key]) {
-      return Facade[key]
-    }
+    const provider = Facade.container.safeUse(this.facadeAccessor)
 
     const apply = (method, _this, args) => method.bind(provider)(...args)
 

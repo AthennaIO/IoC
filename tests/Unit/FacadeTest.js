@@ -9,12 +9,20 @@
 
 import { test } from '@japa/runner'
 
-import { Facade, Ioc } from '#src/index'
+import { Facade } from '#src/index'
 import { SumService } from '#tests/Stubs/SumService'
+import { REAL_METHODS } from '#src/Constants/RealMethods'
 
 test.group('\n FacadeTest', group => {
   group.each.setup(() => {
     ioc.bind('Athenna/Services/SumService', SumService)
+  })
+
+  test('should be able to get the facade alias', async ({ assert }) => {
+    /** @type {SumService & typeof Facade} */
+    const Sum = Facade.createFor('Athenna/Services/SumService')
+
+    assert.deepEqual(Sum.getFacadeAlias(), 'Athenna/Services/SumService')
   })
 
   test('should be able to create a new Facade for SumService', async ({ assert }) => {
@@ -39,13 +47,6 @@ test.group('\n FacadeTest', group => {
     assert.equal(sum.number, 30)
   })
 
-  test('should be able to access methods from the Facade class when needed', async ({ assert }) => {
-    /** @type {SumService & typeof Facade} */
-    const Sum = Facade.createFor('Athenna/Services/SumService')
-
-    assert.instanceOf(Sum.container, Ioc)
-  })
-
   test('should return undefined when the provider key does not exist', async ({ assert }) => {
     /** @type {SumService & typeof Facade} */
     const Sum = Facade.createFor('Athenna/Services/SumService')
@@ -57,14 +58,42 @@ test.group('\n FacadeTest', group => {
     /** @type {SumService & typeof Facade} */
     const Sum = Facade.createFor('Athenna/Services/SumService')
 
-    Sum.__mock('get', function () {
-      return this.number + 2
+    Sum.fakeMethod('get', function (n = 0) {
+      return this.number + n + 10
     })
 
-    assert.deepEqual(Sum.set(10).get(), 12)
+    const mock = Sum.getMock()
 
-    Sum.__restore('get')
+    mock.expects('get').exactly(1).returns(10)
 
-    assert.deepEqual(Sum.set(10).get(), 10)
+    assert.deepEqual(Sum.get(), 10)
+    mock.verify()
+    assert.deepEqual(Sum.get(1), 11)
+
+    Sum.restoreMethod('get')
+
+    assert.deepEqual(Sum.get(), 0)
+  })
+
+  test('should be able to remove all mocked methods from the facade at one time', async ({ assert }) => {
+    /** @type {SumService & typeof Facade} */
+    const Sum = Facade.createFor('Athenna/Services/SumService')
+
+    Sum.fakeMethod('get', () => 1)
+      .fakeMethod('sum', number => number + 1)
+      .fakeMethod('setAsync', () => Sum)
+
+    assert.deepEqual(REAL_METHODS.size, 3)
+
+    Sum.restoreAllMethods()
+
+    assert.deepEqual(REAL_METHODS.size, 0)
+  })
+
+  test('should be able to call restore method even if the method is not mocked', async ({ assert }) => {
+    /** @type {SumService & typeof Facade} */
+    const Sum = Facade.createFor('Athenna/Services/SumService')
+
+    assert.doesNotThrows(() => Sum.restoreMethod('not-found'))
   })
 })

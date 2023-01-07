@@ -39,6 +39,15 @@ test.group('IocTest', group => {
     assert.lengthOf(Object.keys(dependencies), 4)
   })
 
+  test('should be able to get the registration object of the dependency', async ({ assert }) => {
+    ioc.bind('Services/UserService', UserService)
+
+    const registration = ioc.getRegistration('Services/UserService')
+
+    assert.deepEqual(registration.lifetime, 'TRANSIENT')
+    assert.deepEqual(registration.hasCamelAlias, true)
+  })
+
   test('should create an alias for the alias', async ({ assert }) => {
     ioc.singleton('Services/ClientService', ClientService)
     ioc.singleton('Services/UserService', UserService)
@@ -104,7 +113,7 @@ test.group('IocTest', group => {
   })
 
   test('should be able to create mock inside the container', async ({ assert }) => {
-    ioc.mock('Services/ClientService', ClientServiceMock)
+    ioc.fake('Services/ClientService', ClientServiceMock)
     ioc.singleton('Services/ClientService', ClientService) // This call will not replace ClientServiceMock.
 
     const clientService = ioc.safeUse('Services/ClientService')
@@ -114,8 +123,8 @@ test.group('IocTest', group => {
   })
 
   test('should be able to clear the mocks from the container', async ({ assert }) => {
-    ioc.mock('Services/ClientService', ClientServiceMock)
-    ioc.unmock('Services/ClientService')
+    ioc.fake('Services/ClientService', ClientServiceMock)
+    ioc.unfake('Services/ClientService')
     ioc.singleton('Services/ClientService', ClientService) // This call will replace ClientServiceMock.
 
     const clientService = ioc.safeUse('Services/ClientService')
