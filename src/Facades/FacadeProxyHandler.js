@@ -133,8 +133,6 @@ export class FacadeProxyHandler {
   __callStatic(Facade, key) {
     const provider = Facade.container.safeUse(this.facadeAccessor)
 
-    const apply = (method, _this, args) => method.bind(provider)(...args)
-
     if (provider[key] === undefined) {
       return undefined
     }
@@ -143,6 +141,8 @@ export class FacadeProxyHandler {
       return provider[key]
     }
 
-    return new Proxy(provider[key], { apply })
+    return new Proxy(provider[key], {
+      apply: (method, _this, args) => method.bind(provider)(...args),
+    })
   }
 }
