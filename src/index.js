@@ -142,6 +142,9 @@ export class Ioc {
 
   /**
    * Bind a transient dependency to the container.
+   * Transient dependencies will always resolve a new
+   * instance of it everytime you (or Athenna internally)
+   * call ".use" or ".safeUse" method.
    *
    * @param {string} alias
    * @param {any} dependency
@@ -149,6 +152,23 @@ export class Ioc {
    * @return {Ioc}
    */
   bind(alias, dependency, createCamelAlias = true) {
+    this.#register(alias, dependency, { type: 'transient', createCamelAlias })
+
+    return this
+  }
+
+  /**
+   * Bind a transient dependency to the container.
+   * Transient dependencies will always resolve a new
+   * instance of it everytime you (or Athenna internally)
+   * call ".use" or ".safeUse" method.
+   *
+   * @param {string} alias
+   * @param {any} dependency
+   * @param {boolean} [createCamelAlias]
+   * @return {Ioc}
+   */
+  transient(alias, dependency, createCamelAlias = true) {
     this.#register(alias, dependency, { type: 'transient', createCamelAlias })
 
     return this
@@ -170,6 +190,9 @@ export class Ioc {
 
   /**
    * Bind an instance dependency to the container.
+   * Instance dependencies have the same behavior of
+   * singleton dependencies, but you will have more control
+   * on how you want to create your dependency constructor.
    *
    * @param {string} alias
    * @param {any} dependency
@@ -184,6 +207,9 @@ export class Ioc {
 
   /**
    * Bind a singleton dependency to the container.
+   * Singleton dependencies will always resolve the same
+   * instance of it everytime you (or Athenna internally)
+   * call ".use" or ".safeUse" method.
    *
    * @param {string} alias
    * @param {any} dependency
@@ -198,6 +224,9 @@ export class Ioc {
 
   /**
    * Bind a fake dependency to the container.
+   * Fake dependencies will not let the container
+   * register the dependencies until you call ".unfake"
+   * method.
    *
    * @param {string} alias
    * @param {any} dependency
