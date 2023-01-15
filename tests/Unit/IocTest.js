@@ -30,7 +30,7 @@ test.group('IocTest', group => {
   })
 
   test('should be able to list dependencies of the container', async ({ assert }) => {
-    ioc.bind('Services/UserService', UserService)
+    ioc.transient('Services/UserService', UserService)
     ioc.singleton('Services/ClientService', ClientService)
 
     const dependencies = ioc.list()
