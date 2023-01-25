@@ -7,11 +7,12 @@
  * file that was distributed with this source code.
  */
 
-import { pathToFileURL } from 'url'
 import { assert } from '@japa/assert'
+import { pathToFileURL } from 'node:url'
 import { specReporter } from '@japa/spec-reporter'
-import { runFailedTests } from '@japa/run-failed-tests'
 import { processCliArgs, configure, run } from '@japa/runner'
+
+import('./japaTypes.js')
 
 /*
 |--------------------------------------------------------------------------
@@ -27,13 +28,16 @@ import { processCliArgs, configure, run } from '@japa/runner'
 | Please consult japa.dev/runner-config for the config docs.
 */
 
+process.env.IS_TS = 'true'
+
 configure({
   ...processCliArgs(process.argv.slice(2)),
   ...{
-    files: ['tests/**/*Test.js'],
-    plugins: [assert(), runFailedTests()],
+    files: ['tests/**/*Test.ts'],
+    plugins: [assert()],
     reporters: [specReporter()],
     importer: filePath => import(pathToFileURL(filePath).href),
+    timeout: 5000,
   },
 })
 

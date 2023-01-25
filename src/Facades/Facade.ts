@@ -7,21 +7,19 @@
  * file that was distributed with this source code.
  */
 
-import { Ioc } from '#src/index'
-import { FacadeProxyHandler } from '#src/Facades/FacadeProxyHandler'
+import { Ioc } from '#src/Container/Ioc'
+import { FacadeProxyHandler, FacadeType } from '#src/Facades/FacadeProxyHandler'
 
 export class Facade {
   /**
    * The container to resolve dependencies.
-   *
-   * @type {Ioc}
    */
-  static container
+  public static container: Ioc
 
   /**
    * Set the container if it does not exist.
    */
-  static setContainer() {
+  public static setContainer(): void {
     if (this.container) {
       return
     }
@@ -31,13 +29,13 @@ export class Facade {
 
   /**
    * Create a new Facade for the alias specified
-   *
-   * @param {string} alias
-   * @return {typeof Facade}
    */
-  static createFor(alias) {
+  public static createFor<T = any>(alias: string): FacadeType<T> {
     this.setContainer()
 
-    return new Proxy(this, new FacadeProxyHandler(this.container, alias))
+    return new Proxy(
+      this,
+      new FacadeProxyHandler<T>(this.container, alias),
+    ) as any
   }
 }

@@ -21,55 +21,55 @@ test.group('IocTest', group => {
   })
 
   test('should be able to bind dependencies inside the container and use then', async ({ assert }) => {
-    ioc.bind('Services/UserService', UserService)
-    ioc.singleton('Services/ClientService', ClientService)
+    container.bind('Services/UserService', UserService)
+    container.singleton('Services/ClientService', ClientService)
 
-    const userService = ioc.safeUse('Services/UserService')
+    const userService = container.safeUse('Services/UserService')
 
     assert.lengthOf(userService.find(), 3)
   })
 
   test('should be able to list dependencies of the container', async ({ assert }) => {
-    ioc.transient('Services/UserService', UserService)
-    ioc.singleton('Services/ClientService', ClientService)
+    container.transient('Services/UserService', UserService)
+    container.singleton('Services/ClientService', ClientService)
 
-    const dependencies = ioc.list()
+    const dependencies = container.list()
 
     assert.isObject(dependencies)
     assert.lengthOf(Object.keys(dependencies), 4)
   })
 
   test('should be able to get the registration object of the dependency', async ({ assert }) => {
-    ioc.bind('Services/UserService', UserService)
+    container.bind('Services/UserService', UserService)
 
-    const registration = ioc.getRegistration('Services/UserService')
+    const registration = container.getRegistration('Services/UserService')
 
     assert.deepEqual(registration.lifetime, 'TRANSIENT')
     assert.deepEqual(registration.hasCamelAlias, true)
   })
 
   test('should create an alias for the alias', async ({ assert }) => {
-    ioc.singleton('Services/ClientService', ClientService)
-    ioc.singleton('Services/UserService', UserService)
+    container.singleton('Services/ClientService', ClientService)
+    container.singleton('Services/UserService', UserService)
 
-    const userService = ioc.safeUse('userService')
+    const userService = container.safeUse('userService')
 
     assert.lengthOf(userService.find(), 3)
   })
 
   test('should be able to override dependencies', async ({ assert }) => {
-    ioc.singleton('Services/ClientService', ClientService)
-    ioc.singleton('Services/UserService', UserService)
-    ioc.singleton('Services/UserService', ClientService)
+    container.singleton('Services/ClientService', ClientService)
+    container.singleton('Services/UserService', UserService)
+    container.singleton('Services/UserService', ClientService)
 
-    const clientService = ioc.safeUse('Services/UserService')
+    const clientService = container.safeUse('Services/UserService')
 
     assert.deepEqual(clientService.find(), [
       { id: 1, name: 'LinkApi' },
       { id: 2, name: 'Semantix' },
     ])
 
-    const clientServiceCamelAlias = ioc.safeUse('userService')
+    const clientServiceCamelAlias = container.safeUse('userService')
 
     assert.deepEqual(clientServiceCamelAlias.find(), [
       { id: 1, name: 'LinkApi' },
@@ -78,63 +78,63 @@ test.group('IocTest', group => {
   })
 
   test('should be able to use other providers inside services', async ({ assert }) => {
-    ioc.singleton('Services/ClientService', ClientService)
-    ioc.singleton('Services/UserService', UserService)
+    container.singleton('Services/ClientService', ClientService)
+    container.singleton('Services/UserService', UserService)
 
-    const userService = ioc.safeUse('userService')
+    const userService = container.safeUse('userService')
 
     assert.lengthOf(userService.find(), 3)
     assert.lengthOf(userService.find()[0].clients, 2)
   })
 
   test('should be able to create alias from other providers in the Ioc', async ({ assert }) => {
-    ioc
+    container
       .singleton('Services/ClientService', ClientService)
       .alias('Services/Aliases/ClientService', 'Services/ClientService')
 
-    const clientService = ioc.safeUse('Services/Aliases/ClientService')
+    const clientService = container.safeUse('Services/Aliases/ClientService')
 
     assert.lengthOf(clientService.find(), 2)
     assert.deepEqual(clientService.find()[0], { id: 1, name: 'LinkApi' })
   })
 
   test('should return undefined when the dependency does not exist', async ({ assert }) => {
-    const clientService = ioc.use('Services/ClientService')
+    const clientService = container.use('Services/ClientService')
 
     assert.isUndefined(clientService)
   })
 
   test('should throw an error when trying to use a dependency that does not exist', async ({ assert }) => {
-    ioc.singleton('Services/ClientService', ClientService)
+    container.singleton('Services/ClientService', ClientService)
 
-    const useCase = () => ioc.safeUse('Services/Aliases/ClientService')
+    const useCase = () => container.safeUse('Services/Aliases/ClientService')
 
     assert.throws(useCase, NotFoundDependencyException)
   })
 
   test('should be able to create mock inside the container', async ({ assert }) => {
-    ioc.fake('Services/ClientService', ClientServiceMock)
-    ioc.singleton('Services/ClientService', ClientService) // This call will not replace ClientServiceMock.
+    container.fake('Services/ClientService', ClientServiceMock)
+    container.singleton('Services/ClientService', ClientService) // This call will not replace ClientServiceMock.
 
-    const clientService = ioc.safeUse('Services/ClientService')
+    const clientService = container.safeUse('Services/ClientService')
 
     assert.lengthOf(clientService.find(), 2)
     assert.deepEqual(clientService.find()[0], { id: 1, name: 'Mock' })
   })
 
   test('should be able to clear the mocks from the container', async ({ assert }) => {
-    ioc.fake('Services/ClientService', ClientServiceMock)
-    ioc.unfake('Services/ClientService')
-    ioc.singleton('Services/ClientService', ClientService) // This call will replace ClientServiceMock.
+    container.fake('Services/ClientService', ClientServiceMock)
+    container.unfake('Services/ClientService')
+    container.singleton('Services/ClientService', ClientService) // This call will replace ClientServiceMock.
 
-    const clientService = ioc.safeUse('Services/ClientService')
+    const clientService = container.safeUse('Services/ClientService')
 
     assert.lengthOf(clientService.find(), 2)
     assert.deepEqual(clientService.find()[0], { id: 1, name: 'LinkApi' })
   })
 
   test('should throw a not found dependency exception when alias doesnt exist', async ({ assert }) => {
-    const useCase = () => ioc.alias('Alias', 'OtherAlias')
+    const useCase = () => container.alias('Alias', 'OtherAlias')
 
     assert.throws(useCase, NotFoundDependencyException)
   })

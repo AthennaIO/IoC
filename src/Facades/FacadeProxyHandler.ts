@@ -7,20 +7,44 @@
  * file that was distributed with this source code.
  */
 
-import { Is } from '@athenna/common'
-import { createRequire } from 'node:module'
+import { SinonMock } from 'sinon'
+import { Ioc } from '#src/Container/Ioc'
+import { Facade } from '#src/Facades/Facade'
+import { Except, Is, Module } from '@athenna/common'
 import { PROTECTED_FACADE_METHODS } from '#src/Constants/ProtectedFacadeMethods'
 
-const require = createRequire(import.meta.url)
+const require = Module.createRequire(import.meta.url)
 
-export class FacadeProxyHandler {
+export type FacadeType<T = any> = Except<
+  // eslint-disable-next-line no-use-before-define
+  FacadeProxyHandler,
+  'get' | '__callStatic'
+> &
+  T
+
+export class FacadeProxyHandler<T = any> {
+  /**
+   * The container to resolve dependencies.
+   */
+  private container: Ioc
+
+  /**
+   * The facade accessor that will be used
+   * to resolve the dependency inside the
+   * service container.
+   */
+  private facadeAccessor: string
+
+  /**
+   * The mocked provider instance that will
+   * be used with Sinon.
+   */
+  private mockedProvider: any
+
   /**
    * Creates a new instance of FacadeProxyHandler.
-   *
-   * @param {Ioc} container
-   * @param {string} facadeAccessor
    */
-  constructor(container, facadeAccessor) {
+  public constructor(container: Ioc, facadeAccessor: string) {
     this.container = container
     this.facadeAccessor = facadeAccessor
   }
@@ -28,65 +52,50 @@ export class FacadeProxyHandler {
   /**
    * Get the facade alias registered to resolve deps
    * from the Ioc.
-   *
-   * @return {string}
    */
-  getFacadeAlias() {
+  public getFacadeAlias(): string {
     return this.facadeAccessor
   }
 
   /**
    * Get the facade provider resolved from the Ioc.
-   *
-   * @return {any}
    */
-  getFacadeProvider() {
-    return this.container.safeUse(this.facadeAccessor)
+  public getFacadeProvider(): T {
+    return this.container.safeUse<T>(this.facadeAccessor)
   }
 
   /**
    * Set a fake return value in the Facade method.
-   *
-   * @param method {string}
-   * @param returnValue {any}
-   * @return {typeof Facade}
    */
-  fakeMethod(method, returnValue) {
+  public fakeMethod(method: string, returnValue: any): FacadeType<T> {
     this.container.fakeMethod(this.facadeAccessor, method, returnValue)
 
-    return this
+    return this as any
   }
 
   /**
    * Restore the mocked method to his default state.
-   *
-   * @param method {string}
-   * @return {typeof Facade}
    */
-  restoreMethod(method) {
+  public restoreMethod(method: string): FacadeType<T> {
     this.container.restoreMethod(this.facadeAccessor, method)
 
-    return this
+    return this as any
   }
 
   /**
    * Restore all the mocked methods of this facade to
    * their default state.
-   *
-   * @return {typeof Facade}
    */
-  restoreAllMethods() {
+  public restoreAllMethods(): FacadeType<T> {
     this.container.restoreAllMethods(this.facadeAccessor)
 
-    return this
+    return this as any
   }
 
   /**
    * Return a sinon mock instance.
-   *
-   * @return {any}
    */
-  getMock() {
+  public getMock(): SinonMock {
     const sinon = require('sinon')
 
     this.mockedProvider = this.getFacadeProvider()
@@ -104,12 +113,8 @@ export class FacadeProxyHandler {
 
   /**
    * Method called by Proxy everytime a new property is called.
-   *
-   * @param {typeof import('#src/Facades/Facade').Facade} Facade
-   * @param {string} key
-   * @return {any}
    */
-  get(Facade, key) {
+  public get(facade: typeof Facade, key: string): any {
     if (PROTECTED_FACADE_METHODS.includes(key)) {
       return this[key].bind(this)
     }
@@ -118,20 +123,16 @@ export class FacadeProxyHandler {
       return this.mockedProvider[key]
     }
 
-    return this.__callStatic(Facade, key)
+    return this.__callStatic(facade, key)
   }
 
   /**
    * Returns the provider method with a Proxy applied in apply.
    * This way we guarantee that we are working with
    * the same instance when a Facade method returns this.
-   *
-   * @param {typeof import('#src/Facades/Facade').Facade} Facade
-   * @param {string} key
-   * @return {any}
    */
-  __callStatic(Facade, key) {
-    const provider = Facade.container.safeUse(this.facadeAccessor)
+  public __callStatic(facade: typeof Facade, key: string): any {
+    const provider = facade.container.safeUse(this.facadeAccessor)
 
     if (provider[key] === undefined) {
       return undefined

@@ -15,4 +15,4 @@
 | The facades real methods, used to save the facades real methods. This way
 | we can easily restore the default state of the dependency.
 */
-export const REAL_METHODS = new Map()
+export const REAL_METHODS = new Map<string, any>()

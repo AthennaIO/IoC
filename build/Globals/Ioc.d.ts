@@ -1,3 +1,5 @@
+import { Ioc } from '#src/Container/Ioc';
+
 /**
  * @athenna/ioc
  *
@@ -7,13 +9,7 @@
  * file that was distributed with this source code.
  */
 
-export class ClientService {
-  #clients = [
-    { id: 1, name: 'LinkApi' },
-    { id: 2, name: 'Semantix' },
-  ]
-
-  find() {
-    return this.#clients
-  }
+declare global {
+    export const ioc: Ioc;
+    export const container: Ioc;
 }
