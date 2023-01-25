@@ -86,7 +86,9 @@
     "include": [
       "src/**/*.ts"
     ],
-    "exclude": ["src/Providers/ServiceProvider.ts"],
+    "exclude": [
+      "src/Providers/ServiceProvider.ts"
+    ],
     "reporter": [
       "text-summary",
       "html"
