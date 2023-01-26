@@ -8,5 +8,5 @@
  */
 
 export class StringHelper {
-  constructor() {}
+  public constructor() {}
 }

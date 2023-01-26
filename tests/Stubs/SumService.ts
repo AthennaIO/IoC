@@ -8,15 +8,12 @@
  */
 
 export class SumService {
-  number = 0
+  public number = 0
 
   /**
    * Set a number.
-   *
-   * @param {number} number
-   * @return {SumService}
    */
-  set(number) {
+  public set(number: number): this {
     this.number = number + this.number
 
     return this
@@ -24,11 +21,8 @@ export class SumService {
 
   /**
    * Set a number.
-   *
-   * @param {number} number
-   * @return {Promise<SumService>}
    */
-  async setAsync(number) {
+  public async setAsync(number: number): Promise<SumService> {
     this.number = number + this.number
 
     return this
@@ -36,10 +30,8 @@ export class SumService {
 
   /**
    * Get the number
-   *
-   * @return {number}
    */
-  get() {
+  public get(): number {
     return this.number
   }
 }

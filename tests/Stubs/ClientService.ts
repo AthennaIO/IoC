@@ -7,13 +7,18 @@
  * file that was distributed with this source code.
  */
 
+export interface Client {
+  id: number
+  name: string
+}
+
 export class ClientService {
-  #clients = [
+  private clients = [
     { id: 1, name: 'LinkApi' },
     { id: 2, name: 'Semantix' },
   ]
 
-  find() {
-    return this.#clients
+  public find(): Client[] {
+    return this.clients
   }
 }
