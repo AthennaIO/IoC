@@ -7,13 +7,15 @@
  * file that was distributed with this source code.
  */
 
+import { Client } from './ClientService.js'
+
 export class ClientServiceMock {
-  #clients = [
+  private clients: Client[] = [
     { id: 1, name: 'Mock' },
     { id: 2, name: 'Mock' },
   ]
 
-  find() {
-    return this.#clients
+  public find() {
+    return this.clients
   }
 }

@@ -10,13 +10,14 @@
 import { ServiceProvider } from '#src/index'
 
 export class HelpersProvider extends ServiceProvider {
-  get singletons() {
+  public get singletons() {
     return {
       'Helpers/ClientService': import('#tests/Stubs/ClientService'),
+      'Helpers/DecoratedService': import('#tests/Stubs/DecoratedService'),
     }
   }
 
-  get bindings() {
+  public get bindings() {
     return {
       'Helpers/NewStringHelper': import('#tests/Stubs/StringHelper'),
     }
@@ -32,7 +33,7 @@ export class HelpersProvider extends ServiceProvider {
     this.container.instance('Helpers/StringFn', () => 'StringFn')
   }
 
-  boot() {
+  async boot() {
     this.container.instance('Helpers/NumberFn', () => 'NumberFn')
   }
 

@@ -7,23 +7,31 @@
  * file that was distributed with this source code.
  */
 
+import { Client, ClientService } from './ClientService.js'
+
+export interface User {
+  id: number
+  name: string
+  clients?: Client[]
+}
+
 export class UserService {
-  #users = [
+  private users: User[] = [
     { id: 1, name: 'João' },
     { id: 2, name: 'Victor' },
   ]
 
-  constructor(clientService) {
-    this.#users.push({ id: 3, name: 'Paulo' })
+  public constructor(clientService: ClientService) {
+    this.users.push({ id: 3, name: 'Paulo' })
 
-    this.#users = this.#users.map(user => {
+    this.users = this.users.map(user => {
       user.clients = clientService.find()
 
       return user
     })
   }
 
-  find() {
-    return this.#users
+  public find() {
+    return this.users
   }
 }

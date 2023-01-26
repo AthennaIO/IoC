@@ -7,90 +7,74 @@
  * file that was distributed with this source code.
  */
 
-import { Ioc } from '#src/index'
+import { Ioc } from '#src/Container/Ioc'
 import { Module } from '@athenna/common'
 
 export class ServiceProvider {
-  constructor() {
-    /**
-     * The ioc container instance
-     *
-     * @type {Ioc}
-     */
+  /**
+   * The Ioc container instance.
+   */
+  public container: Ioc
+
+  public constructor() {
     this.container = new Ioc()
   }
 
   /**
    * Set where the type of application where this provider can
    * be registered or not.
-   *
-   * @return {string[]}
    */
-  get bootstrapIn() {
+  public get bootstrapIn(): string[] {
     return ['*']
   }
 
   /**
    * All the container bindings that should be registered.
-   *
-   * @type {Record<string, new (...args: any[]) => any>}
    */
-  get bindings() {
+  public get bindings(): Record<string, any | Promise<any>> {
     return {}
   }
 
   /**
    * All the container instances that should be registered.
-   *
-   * @return {Record<string, any>}
    */
-  get instances() {
+  public get instances(): Record<string, any | Promise<any>> {
     return {}
   }
 
   /**
    * All the container singletons that should be registered.
-   *
-   * @return {Record<string, new (...args: any[]) => any>}
    */
-  get singletons() {
+  public get singletons(): Record<string, any | Promise<any>> {
     return {}
   }
 
   /**
    * Register any application services.
-   *
-   * @return {void|Promise<void>}
    */
-  async register() {
+  public register(): void | Promise<void> {
     //
   }
 
   /**
    * Bootstrap any application services.
-   *
-   * @return {void|Promise<void>}
    */
-  async boot() {
+  public boot(): void | Promise<void> {
     //
   }
 
   /**
    * Shutdown any application services.
-   *
-   * @return {void|Promise<void>}
    */
-  async shutdown() {
+  public shutdown(): void | Promise<void> {
     //
   }
 
   /**
    * Register all three attributes defined within
    * ServiceProvider.
-   *
-   * @return {this}
    */
-  registerAttributes() {
+  public registerAttributes(): this {
     Object.keys(this.bindings).forEach(alias => {
       this.container.bind(alias, Module.get(this.bindings[alias]))
     })
