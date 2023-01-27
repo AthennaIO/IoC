@@ -11,5 +11,7 @@ import('./Globals/Ioc.js')
 
 export * from './Container/Ioc.js'
 export * from './Facades/Facade.js'
+export * from './Decorators/Inject.js'
+export * from './Decorators/Provider.js'
 export * from './Helpers/ProviderFaker.js'
 export * from './Providers/ServiceProvider.js'

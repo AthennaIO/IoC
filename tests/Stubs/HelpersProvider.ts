@@ -13,7 +13,7 @@ export class HelpersProvider extends ServiceProvider {
   public get singletons() {
     return {
       'Helpers/ClientService': import('#tests/Stubs/ClientService'),
-      'Helpers/DecoratedService': import('#tests/Stubs/DecoratedService'),
+      'Helpers/InjectService': import('#tests/Stubs/InjectService'),
     }
   }
 

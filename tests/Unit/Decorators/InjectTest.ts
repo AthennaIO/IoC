@@ -7,16 +7,15 @@
  * file that was distributed with this source code.
  */
 
-import { test } from '@japa/runner'
-
 import { Ioc } from '#src/index'
+import { test } from '@japa/runner'
 import { Exec } from '@athenna/common'
+import { Inject } from '#src/Decorators/Inject'
+import { InjectService } from '#tests/Stubs/InjectService'
 import { HelpersProvider } from '#tests/Stubs/HelpersProvider'
-import { DecoratedService } from '../Stubs/DecoratedService.js'
-import { Inject } from '../../src/Decorators/Inject.js'
-import { NotFoundDependencyException } from '../../src/Exceptions/NotFoundDependencyException.js'
+import { NotFoundDependencyException } from '#src/Exceptions/NotFoundDependencyException'
 
-test.group('InjectTest', group => {
+test.group('InjectDecoratorTest', group => {
   group.each.setup(async () => {
     new Ioc().reconstruct()
 
@@ -30,9 +29,9 @@ test.group('InjectTest', group => {
   })
 
   test('should be able to resolve dependencies using the inject annotation', async ({ assert }) => {
-    const decoratedService = ioc.use<DecoratedService>('Helpers/DecoratedService')
+    const injectService = ioc.use<InjectService>('Helpers/InjectService')
 
-    assert.deepEqual(decoratedService.findClients(), [
+    assert.deepEqual(injectService.findClients(), [
       {
         id: 1,
         name: 'LinkApi',
@@ -45,9 +44,9 @@ test.group('InjectTest', group => {
   })
 
   test('should be able to resolve dependencies alias using the inject annotation', async ({ assert }) => {
-    const decoratedService = ioc.use<DecoratedService>('Helpers/DecoratedService')
+    const injectService = ioc.use<InjectService>('Helpers/InjectService')
 
-    assert.deepEqual(decoratedService.findOneUser(), {
+    assert.deepEqual(injectService.findOneUser(), {
       id: 1,
       name: 'João',
       clients: [
@@ -58,11 +57,11 @@ test.group('InjectTest', group => {
   })
 
   test('should throw exception when trying to resolve a dependency that does not exist', async ({ assert }) => {
-    assert.throws(() => {
-      class _Test {
-        @Inject('NotFound/Alias')
-        private _notFound: any
-      }
-    }, NotFoundDependencyException)
+    class Test {
+      @Inject('NotFound/Alias')
+      public notFound: any
+    }
+
+    assert.throws(() => new Test().notFound.value, NotFoundDependencyException)
   })
 })
