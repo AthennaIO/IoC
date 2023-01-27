@@ -8,6 +8,7 @@
  */
 
 import { Inject } from '#src/Decorators/Inject'
+import { Provider } from '#src/Decorators/Provider'
 import { ClientService } from './ClientService.js'
 import { User, UserService } from './UserService.js'
 
@@ -16,7 +17,8 @@ export interface Client {
   name: string
 }
 
-export class DecoratedService {
+@Provider('App/Services/ProviderService')
+export class ProviderService {
   @Inject('Helpers/UserService')
   private userService: UserService
 
