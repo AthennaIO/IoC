@@ -12,7 +12,41 @@ import { pathToFileURL } from 'node:url'
 import { specReporter } from '@japa/spec-reporter'
 import { processCliArgs, configure, run } from '@japa/runner'
 
-import('./japaTypes.js')
+/*
+|--------------------------------------------------------------------------
+| Japa types
+|--------------------------------------------------------------------------
+|
+| Declare customized japa types.
+*/
+
+declare module '@japa/assert' {
+  export interface Assert {
+    throws(fn: () => void, errType: any, message?: string): void
+    doesNotThrows(fn: () => void, errType: any, message?: string): void
+    rejects(
+      fn: () => void | Promise<void>,
+      errType: any,
+      message?: string,
+    ): Promise<void>
+    doesNotRejects(
+      fn: () => void | Promise<void>,
+      errType: any,
+      message?: string,
+    ): Promise<void>
+  }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Set IS_TS env.
+|--------------------------------------------------------------------------
+|
+| Set the IS_TS environement variable to true. Very useful when using the
+| Path helper.
+*/
+
+process.env.IS_TS = 'true'
 
 /*
 |--------------------------------------------------------------------------
@@ -27,8 +61,6 @@ import('./japaTypes.js')
 |
 | Please consult japa.dev/runner-config for the config docs.
 */
-
-process.env.IS_TS = 'true'
 
 configure({
   ...processCliArgs(process.argv.slice(2)),
