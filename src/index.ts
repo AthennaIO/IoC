@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
-import('./Globals/Ioc.js')
+export * from './Globals/Ioc.js'
 
 export * from './Container/Ioc.js'
 export * from './Facades/Facade.js'

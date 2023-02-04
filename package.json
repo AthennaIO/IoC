@@ -1,6 +1,6 @@
 {
   "name": "@athenna/ioc",
-  "version": "3.1.3",
+  "version": "3.1.4",
   "description": "Global Ioc helper for Athenna ecosystem. Built on top of awilix.",
   "license": "MIT",
   "author": "João Lenon <lenon@athenna.io>",
@@ -140,7 +140,8 @@
       "Container": true,
       "Env": true,
       "Path": true,
-      "Config": true
+      "Config": true,
+      "container": true
     },
     "plugins": [
       "prettier",

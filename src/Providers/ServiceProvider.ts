@@ -21,10 +21,10 @@ export class ServiceProvider {
   }
 
   /**
-   * Set where the type of application where this provider can
+   * Set where the environment of application where this provider can
    * be registered or not.
    */
-  public get bootstrapIn(): string[] {
+  public get environment(): string[] {
     return ['*']
   }
 
