@@ -7,18 +7,19 @@
  * file that was distributed with this source code.
  */
 
-import { test } from '@japa/runner'
+import { Ioc } from '#src'
 import { Exec } from '@athenna/common'
-
-import { Ioc } from '#src/index'
+import { Test, BeforeEach, TestContext } from '@athenna/test'
 import { HelpersProvider } from '#tests/Stubs/HelpersProvider'
 
-test.group('ServiceProviderTest', group => {
-  group.each.setup(() => {
+export default class ServiceProviderTest {
+  @BeforeEach()
+  public async beforeEach() {
     new Ioc().reconstruct()
-  })
+  }
 
-  test('should be able to execute boot, register and shutdown methods', async ({ assert }) => {
+  @Test()
+  public async shouldBeAbleToExecuteBootRegisterAndShutdownMethods({ assert }: TestContext) {
     new HelpersProvider().register()
 
     assert.isDefined(ioc.use('Helpers/StringFn'))
@@ -31,9 +32,10 @@ test.group('ServiceProviderTest', group => {
 
     assert.isNull(ioc.use('Helpers/StringFn'))
     assert.isNull(ioc.use('Helpers/NumberFn'))
-  })
+  }
 
-  test('should be able to create custom service providers using default bindings attribute', async ({ assert }) => {
+  @Test()
+  public async shouldBeAbleToCreateCustomServiceProvidersUsingDefaultBindingsAttribute({ assert }: TestContext) {
     new HelpersProvider().registerAttributes()
 
     /**
@@ -45,5 +47,5 @@ test.group('ServiceProviderTest', group => {
     assert.isDefined(ioc.use('Helpers/UserService'))
     assert.isDefined(ioc.use('Helpers/ClientService'))
     assert.isDefined(ioc.use('Helpers/NewStringHelper'))
-  })
-})
+  }
+}

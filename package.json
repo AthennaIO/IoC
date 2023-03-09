@@ -1,6 +1,6 @@
 {
   "name": "@athenna/ioc",
-  "version": "3.1.4",
+  "version": "3.1.5",
   "description": "Global Ioc helper for Athenna ecosystem. Built on top of awilix.",
   "license": "MIT",
   "author": "João Lenon <lenon@athenna.io>",
@@ -48,6 +48,7 @@
   },
   "devDependencies": {
     "@athenna/common": "^3.3.0",
+    "@athenna/test": "^3.1.1",
     "@japa/assert": "^1.3.6",
     "@japa/run-failed-tests": "^1.1.0",
     "@japa/runner": "^2.2.2",
