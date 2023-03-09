@@ -7,23 +7,26 @@
  * file that was distributed with this source code.
  */
 
-import { test } from '@japa/runner'
-import { Facade } from '#src/index'
+import { Facade } from '#src'
 import { SumService } from '#tests/Stubs/SumService'
 import { REAL_METHODS } from '#src/Constants/RealMethods'
+import { Test, BeforeEach, TestContext } from '@athenna/test'
 
-test.group('FacadeTest', group => {
-  group.each.setup(() => {
+export default class FacadeTest {
+  @BeforeEach()
+  public async beforeEach() {
     ioc.bind('Athenna/Services/SumService', SumService)
-  })
+  }
 
-  test('should be able to get the facade alias', async ({ assert }) => {
+  @Test()
+  public async shouldBeAbleToGetTheFacadeAlias({ assert }: TestContext) {
     const Sum = Facade.createFor<SumService>('Athenna/Services/SumService')
 
     assert.deepEqual(Sum.getFacadeAlias(), 'Athenna/Services/SumService')
-  })
+  }
 
-  test('should be able to create a new Facade for SumService', async ({ assert }) => {
+  @Test()
+  public async shouldBeAbleToCreateANewFacadeForSumService({ assert }: TestContext) {
     const Sum = Facade.createFor<SumService>('Athenna/Services/SumService')
 
     assert.equal(Sum.get(), 0)
@@ -32,24 +35,27 @@ test.group('FacadeTest', group => {
     assert.instanceOf(Sum.set(10), SumService)
     assert.equal((await Sum.setAsync(10)).get(), 10)
     assert.instanceOf(await Sum.setAsync(10), SumService)
-  })
+  }
 
-  test('should be able to save instances for latter usage using Facades', async ({ assert }) => {
+  @Test()
+  public async shouldBeAbleToSaveInstancesForLaterUsageUsingFacades({ assert }: TestContext) {
     const Sum = Facade.createFor<SumService>('Athenna/Services/SumService')
 
     const sum = await Sum.set(10).set(10).setAsync(10)
 
     assert.equal(sum.get(), 30)
     assert.equal(sum.number, 30)
-  })
+  }
 
-  test('should return undefined when the provider key does not exist', async ({ assert }) => {
+  @Test()
+  public async shouldReturnUndefinedWhenTheProviderKeyDoesNotExist({ assert }: TestContext) {
     const Sum = Facade.createFor('Athenna/Services/SumService')
 
     assert.isUndefined(Sum.value)
-  })
+  }
 
-  test('should be able to mock and restore facade methods', async ({ assert }) => {
+  @Test()
+  public async shouldBeAbleToMockAndRestoreFacadeMethods({ assert }: TestContext) {
     const Sum = Facade.createFor('Athenna/Services/SumService')
 
     Sum.fakeMethod('get', function (n = 0) {
@@ -67,9 +73,10 @@ test.group('FacadeTest', group => {
     Sum.restoreMethod('get')
 
     assert.deepEqual(Sum.get(), 0)
-  })
+  }
 
-  test('should be able to remove all mocked methods from the facade at one time', async ({ assert }) => {
+  @Test()
+  public async shouldBeAbleToRemoveAllMockedMethodsFromTheFacadeAtOneTime({ assert }: TestContext) {
     const Sum = Facade.createFor<SumService>('Athenna/Services/SumService')
 
     Sum.fakeMethod('get', () => 1)
@@ -81,11 +88,12 @@ test.group('FacadeTest', group => {
     Sum.restoreAllMethods()
 
     assert.deepEqual(REAL_METHODS.size, 0)
-  })
+  }
 
-  test('should be able to call restore method even if the method is not mocked', async ({ assert }) => {
+  @Test()
+  public async shouldBeAbleToCallRestoreMethodEvenIfTheMethodIsNotMocked({ assert }: TestContext) {
     const Sum = Facade.createFor<SumService>('Athenna/Services/SumService')
 
     assert.doesNotThrows(() => Sum.restoreMethod('not-found'))
-  })
-})
+  }
+}
