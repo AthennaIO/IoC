@@ -47,7 +47,7 @@
     "awilix": "^7.0.3"
   },
   "devDependencies": {
-    "@athenna/common": "^3.4.2",
+    "@athenna/common": "^3.4.4",
     "@athenna/test": "^3.2.2",
     "@japa/assert": "^1.3.6",
     "@japa/run-failed-tests": "^1.1.0",
