@@ -7,11 +7,13 @@
  * file that was distributed with this source code.
  */
 
-export * from './Globals/Ioc.js'
+export * from '#src/globals/Ioc'
 
-export * from './Container/Ioc.js'
-export * from './Facades/Facade.js'
-export * from './Decorators/Inject.js'
-export * from './Helpers/ProviderFaker.js'
-export * from './Providers/ServiceProvider.js'
-export * from './Facades/FacadeProxyHandler.js'
+export * from '#src/container/Ioc'
+export * from '#src/facades/Facade'
+export * from '#src/annotations/Inject'
+export * from '#src/annotations/Service'
+export * from '#src/annotations/MockInject'
+export * from '#src/helpers/ProviderFaker'
+export * from '#src/providers/ServiceProvider'
+export * from '#src/facades/FacadeProxyHandler'
