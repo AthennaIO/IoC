@@ -8,11 +8,10 @@
  */
 
 import { Facade } from '#src'
-import { Test, BeforeEach } from '@athenna/test'
 import { BaseTest } from '#tests/helpers/BaseTest'
-import type { Context } from '@athenna/test/types'
 import { SumService } from '#tests/stubs/SumService'
 import { REAL_METHODS } from '#src/constants/RealMethods'
+import { Test, BeforeEach, type Context } from '@athenna/test'
 
 export default class FacadeTest extends BaseTest {
   @BeforeEach()

@@ -7,6 +7,8 @@
  * file that was distributed with this source code.
  */
 
+export * from './types/index.js'
+
 export * from '#src/globals/Ioc'
 
 export * from '#src/container/Ioc'
