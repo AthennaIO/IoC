@@ -7,13 +7,11 @@
  * file that was distributed with this source code.
  */
 
-import { MockInject } from '#src'
-import { Test } from '@athenna/test'
-import type { Mock } from '#src/types'
+import { MockInject, type Mock } from '#src'
+import { Test, type Context } from '@athenna/test'
 import { BaseTest } from '#tests/helpers/BaseTest'
 import { SumService } from '#tests/stubs/SumService'
 import { OrderService } from '#tests/stubs/OrderService'
-import type { Context } from '@athenna/test/types'
 import { MissingServiceAnnotationException } from '#src/exceptions/MissingServiceAnnotationException'
 
 export default class MockInjectAnnotationTest extends BaseTest {

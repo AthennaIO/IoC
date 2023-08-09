@@ -8,12 +8,11 @@
  */
 
 import { Inject } from '#src'
-import { Test } from '@athenna/test'
+import { Test, type Context } from '@athenna/test'
 import { BaseTest } from '#tests/helpers/BaseTest'
-import type { Context } from '@athenna/test/types'
 import type { InjectService } from '#tests/stubs/InjectService'
-import { MissingServiceAnnotationException } from '#src/exceptions/MissingServiceAnnotationException'
 import { NotFoundDependencyException } from '#src/exceptions/NotFoundDependencyException'
+import { MissingServiceAnnotationException } from '#src/exceptions/MissingServiceAnnotationException'
 
 export default class InjectAnnotationTest extends BaseTest {
   @Test()

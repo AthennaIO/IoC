@@ -7,14 +7,13 @@
  * file that was distributed with this source code.
  */
 
-import { Test } from '@athenna/test'
+import { Exec, Module } from '@athenna/common'
+import { Test, type Context } from '@athenna/test'
 import { BaseTest } from '#tests/helpers/BaseTest'
-import type { Context } from '@athenna/test/types'
 import { UserService } from '#tests/stubs/UserService'
 import { ClientService } from '#tests/stubs/ClientService'
 import { ClientServiceMock } from '#tests/stubs/ClientServiceMock'
 import { NotFoundDependencyException } from '#src/exceptions/NotFoundDependencyException'
-import { Exec, Module } from '@athenna/common'
 
 export default class IocTest extends BaseTest {
   @Test()
