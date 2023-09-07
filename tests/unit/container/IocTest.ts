@@ -10,9 +10,9 @@
 import { Exec, Module } from '@athenna/common'
 import { Test, type Context } from '@athenna/test'
 import { BaseTest } from '#tests/helpers/BaseTest'
-import { UserService } from '#tests/stubs/UserService'
-import { ClientService } from '#tests/stubs/ClientService'
-import { ClientServiceMock } from '#tests/stubs/ClientServiceMock'
+import { UserService } from '#tests/fixtures/UserService'
+import { ClientService } from '#tests/fixtures/ClientService'
+import { ClientServiceMock } from '#tests/fixtures/ClientServiceMock'
 import { NotFoundDependencyException } from '#src/exceptions/NotFoundDependencyException'
 
 export default class IocTest extends BaseTest {
@@ -90,14 +90,14 @@ export default class IocTest extends BaseTest {
 
     assert.deepEqual(clientService.find(), [
       { id: 1, name: 'LinkApi' },
-      { id: 2, name: 'Semantix' },
+      { id: 2, name: 'Semantix' }
     ])
 
     const clientServiceCamelAlias = container.safeUse('userService')
 
     assert.deepEqual(clientServiceCamelAlias.find(), [
       { id: 1, name: 'LinkApi' },
-      { id: 2, name: 'Semantix' },
+      { id: 2, name: 'Semantix' }
     ])
   }
 
@@ -183,7 +183,7 @@ export default class IocTest extends BaseTest {
 
   @Test()
   public async shouldBeAbleToRegisterDependenciesAsPromises({ assert }: Context) {
-    container.transient('Services/ClientService', Module.get(import('#tests/stubs/ClientService')))
+    container.transient('Services/ClientService', Module.get(import('#tests/fixtures/ClientService')))
 
     await Exec.sleep(10)
 
@@ -191,7 +191,7 @@ export default class IocTest extends BaseTest {
 
     assert.deepEqual(clientService.find(), [
       { id: 1, name: 'LinkApi' },
-      { id: 2, name: 'Semantix' },
+      { id: 2, name: 'Semantix' }
     ])
   }
 }

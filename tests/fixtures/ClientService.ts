@@ -20,7 +20,7 @@ export class ClientService {
 
   private clients = [
     { id: 1, name: 'LinkApi' },
-    { id: 2, name: 'Semantix' },
+    { id: 2, name: 'Semantix' }
   ]
 
   public find(): Client[] {

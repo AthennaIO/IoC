@@ -24,7 +24,7 @@ export function Inject(alias?: string): PropertyDecorator {
     debug(
       'Injecting %s dependency alias in %s dependency.',
       alias,
-      target.constructor.name,
+      target.constructor.name
     )
 
     const dependency = ioc.safeUse(alias)
@@ -36,7 +36,7 @@ export function Inject(alias?: string): PropertyDecorator {
     debug(
       'Dependency alias %s injected in %s dependency.',
       alias,
-      target.constructor.name,
+      target.constructor.name
     )
 
     Object.defineProperty(target, key, { value: dependency })

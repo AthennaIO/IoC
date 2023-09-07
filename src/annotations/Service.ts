@@ -20,7 +20,7 @@ export function Service(options?: ServiceOptions): ClassDecorator {
   return (target: any) => {
     options = Options.create(options, {
       alias: `App/Services/${target.name}`,
-      type: 'transient',
+      type: 'transient'
     })
 
     const alias = options.alias
@@ -30,14 +30,14 @@ export function Service(options?: ServiceOptions): ClassDecorator {
       'Registering %s dependency as a %s in the service container with %s alias.',
       target.name,
       options.type,
-      alias,
+      alias
     )
 
     if (ioc.hasDependency(alias)) {
       debug(
         'Dependency with alias %s already exists in the service provider, skipping registration of %s dependency.',
         alias,
-        target.name,
+        target.name
       )
 
       defineMetadata(target, options)
@@ -51,7 +51,7 @@ export function Service(options?: ServiceOptions): ClassDecorator {
       'Dependency %s with alias %s registered in the service container as a %s dependency.',
       target.name,
       alias,
-      options.type,
+      options.type
     )
 
     defineMetadata(target, options)

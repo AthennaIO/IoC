@@ -10,36 +10,36 @@
 import { Inject } from '#src'
 import { Test, type Context } from '@athenna/test'
 import { BaseTest } from '#tests/helpers/BaseTest'
-import type { InjectService } from '#tests/stubs/InjectService'
+import type { InjectService } from '#tests/fixtures/InjectService'
 import { NotFoundDependencyException } from '#src/exceptions/NotFoundDependencyException'
 import { MissingServiceAnnotationException } from '#src/exceptions/MissingServiceAnnotationException'
 
 export default class InjectAnnotationTest extends BaseTest {
   @Test()
   public async shouldBeAbleToResolveDependenciesUsingTheInjectAnnotation({ assert }: Context) {
-    await this.import('#tests/stubs/ClientService')
-    await this.import('#tests/stubs/UserService')
-    await this.import('#tests/stubs/InjectService')
+    await this.import('#tests/fixtures/ClientService')
+    await this.import('#tests/fixtures/UserService')
+    await this.import('#tests/fixtures/InjectService')
 
     const injectService = ioc.use<InjectService>('injectService')
 
     assert.deepEqual(injectService.findClients(), [
       {
         id: 1,
-        name: 'LinkApi',
+        name: 'LinkApi'
       },
       {
         id: 2,
-        name: 'Semantix',
-      },
+        name: 'Semantix'
+      }
     ])
   }
 
   @Test()
   public async shouldBeAbleToResolveDependenciesAliasUsingTheInjectAnnotation({ assert }: Context) {
-    await this.import('#tests/stubs/ClientService')
-    await this.import('#tests/stubs/UserService')
-    await this.import('#tests/stubs/InjectService')
+    await this.import('#tests/fixtures/ClientService')
+    await this.import('#tests/fixtures/UserService')
+    await this.import('#tests/fixtures/InjectService')
 
     const injectService = ioc.use<InjectService>('injectService')
 
@@ -48,8 +48,8 @@ export default class InjectAnnotationTest extends BaseTest {
       name: 'João',
       clients: [
         { id: 1, name: 'LinkApi' },
-        { id: 2, name: 'Semantix' },
-      ],
+        { id: 2, name: 'Semantix' }
+      ]
     })
   }
 
@@ -66,7 +66,7 @@ export default class InjectAnnotationTest extends BaseTest {
 
   @Test()
   public async shouldThrowExceptionWhenTryingToResolveADependencyThatDoesNotHaveServiceAnnotationPresent({
-    assert,
+    assert
   }: Context) {
     ioc.singleton('missingAnnotationService', () => 'hello')
 

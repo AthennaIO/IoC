@@ -30,19 +30,19 @@ export function MockInject(dependency: any): PropertyDecorator {
     debug(
       'Registering %s dependency as singleton in the service container with %s alias.',
       dependency.name,
-      alias,
+      alias
     )
 
     ioc.singleton(alias, dependency, true)
 
     Object.defineProperty(target, key, {
-      value: sinon.mock(ioc.safeUse(alias)),
+      value: sinon.mock(ioc.safeUse(alias))
     })
 
     debug(
       'Dependency %s registered as a mock in %s target.',
       dependency.name,
-      target.constructor.name,
+      target.constructor.name
     )
   }
 }
