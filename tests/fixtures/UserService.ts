@@ -20,7 +20,7 @@ export interface User {
 export class UserService {
   private users: User[] = [
     { id: 1, name: 'João' },
-    { id: 2, name: 'Victor' },
+    { id: 2, name: 'Victor' }
   ]
 
   public constructor(clientService: ClientService) {

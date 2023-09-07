@@ -36,7 +36,7 @@ export class Facade {
 
     return new Proxy(
       this,
-      new FacadeProxyHandler<T>(this.container, alias),
+      new FacadeProxyHandler<T>(this.container, alias)
     ) as unknown as FacadeType<T>
   }
 }

@@ -15,7 +15,7 @@ export class MissingServiceAnnotationException extends Exception {
       status: 500,
       code: 'E_MISSING_SERVICE_ANNOTATION',
       message: `Missing @Service() annotation in ${name} dependency.`,
-      help: `The @Service() annotation is required to be present in your ${name} dependency to use @Inject() or @MockInject() annotations.`,
+      help: `The @Service() annotation is required to be present in your ${name} dependency to use @Inject() or @MockInject() annotations.`
     })
   }
 }

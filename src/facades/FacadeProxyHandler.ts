@@ -101,7 +101,7 @@ export class FacadeProxyHandler<T = any> {
         }
 
         return mock[method]
-      },
+      }
     })
   }
 
@@ -137,7 +137,7 @@ export class FacadeProxyHandler<T = any> {
     }
 
     return new Proxy(provider[key], {
-      apply: (method, _this, args) => method.bind(provider)(...args),
+      apply: (method, _this, args) => method.bind(provider)(...args)
     })
   }
 }

@@ -18,7 +18,7 @@ interface Order {
 export class OrderService {
   public orders: Order[] = [
     { id: 1, title: 'Order 1' },
-    { id: 2, title: 'Order 2' },
+    { id: 2, title: 'Order 2' }
   ]
 
   public constructor() {

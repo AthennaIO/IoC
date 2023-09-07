@@ -9,7 +9,7 @@
 
 import { BaseTest } from '#tests/helpers/BaseTest'
 import { Test, type Context } from '@athenna/test'
-import { HelpersProvider } from '#tests/stubs/HelpersProvider'
+import { HelpersProvider } from '#tests/fixtures/HelpersProvider'
 
 export default class ServiceProviderTest extends BaseTest {
   @Test()

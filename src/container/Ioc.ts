@@ -13,14 +13,14 @@ import {
   asValue,
   asFunction,
   InjectionMode,
-  createContainer,
+  createContainer
 } from 'awilix'
 
 import type {
   Resolver,
   AwilixContainer,
   RegistrationHash,
-  ContainerOptions,
+  ContainerOptions
 } from 'awilix'
 
 import { debug } from '#src/debug'
@@ -62,7 +62,7 @@ export class Ioc {
 
     debug(
       'Reconstructing the container using the following options: %o.',
-      options,
+      options
     )
 
     return this
@@ -79,7 +79,7 @@ export class Ioc {
    * Return the registration of the dependency.
    */
   public getRegistration<T = any>(
-    alias: string,
+    alias: string
   ): Resolver<T> & { hasCamelAlias: boolean } {
     const registration = Ioc.container.getRegistration(alias) as Resolver<T> & {
       hasCamelAlias: boolean
@@ -155,7 +155,7 @@ export class Ioc {
   public transient(
     alias: string,
     dependency: any,
-    createCamelAlias = true,
+    createCamelAlias = true
   ): Ioc {
     this.register(alias, dependency, { type: 'transient', createCamelAlias })
 
@@ -171,7 +171,7 @@ export class Ioc {
   public instance(
     alias: string,
     dependency: any,
-    createCamelAlias = true,
+    createCamelAlias = true
   ): Ioc {
     this.register(alias, dependency, { type: 'singleton', createCamelAlias })
 
@@ -187,7 +187,7 @@ export class Ioc {
   public singleton(
     alias: string,
     dependency: any,
-    createCamelAlias = true,
+    createCamelAlias = true
   ): Ioc {
     this.register(alias, dependency, { type: 'singleton', createCamelAlias })
 
@@ -277,7 +277,7 @@ export class Ioc {
    */
   private getAwilixBinder(
     type: 'transient' | 'scoped' | 'singleton',
-    dependency: any,
+    dependency: any
   ): any {
     if (Is.Class(dependency)) {
       return asClass(dependency)[type]()
@@ -299,7 +299,7 @@ export class Ioc {
     options: {
       type?: 'transient' | 'scoped' | 'singleton'
       createCamelAlias?: boolean
-    },
+    }
   ): void {
     if (this.isFaked(alias)) {
       return
@@ -307,7 +307,7 @@ export class Ioc {
 
     options = Options.create(options, {
       type: 'transient',
-      createCamelAlias: true,
+      createCamelAlias: true
     })
 
     /**
@@ -329,7 +329,7 @@ export class Ioc {
     if (dependency && dependency.then) {
       debug(
         'Dependency alias %s is a promise. Waiting for it to resolve to register it.',
-        alias,
+        alias
       )
 
       dependency.then(dep => register(dep))

@@ -12,7 +12,7 @@ import { type Client } from './ClientService.js'
 export class ClientServiceMock {
   private clients: Client[] = [
     { id: 1, name: 'Mock' },
-    { id: 2, name: 'Mock' },
+    { id: 2, name: 'Mock' }
   ]
 
   public find() {

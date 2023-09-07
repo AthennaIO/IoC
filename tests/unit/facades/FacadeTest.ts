@@ -9,7 +9,7 @@
 
 import { Facade } from '#src'
 import { BaseTest } from '#tests/helpers/BaseTest'
-import { SumService } from '#tests/stubs/SumService'
+import { SumService } from '#tests/fixtures/SumService'
 import { REAL_METHODS } from '#src/constants/RealMethods'
 import { Test, BeforeEach, type Context } from '@athenna/test'
 

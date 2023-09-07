@@ -20,5 +20,5 @@ export const PROTECTED_FACADE_METHODS = [
   'restoreMethod',
   'getFacadeAlias',
   'getFacadeProvider',
-  'restoreAllMethods',
+  'restoreAllMethods'
 ]

@@ -10,15 +10,15 @@
 import { MockInject, type Mock } from '#src'
 import { Test, type Context } from '@athenna/test'
 import { BaseTest } from '#tests/helpers/BaseTest'
-import { SumService } from '#tests/stubs/SumService'
-import { OrderService } from '#tests/stubs/OrderService'
+import { SumService } from '#tests/fixtures/SumService'
+import { OrderService } from '#tests/fixtures/OrderService'
 import { MissingServiceAnnotationException } from '#src/exceptions/MissingServiceAnnotationException'
 
 export default class MockInjectAnnotationTest extends BaseTest {
   @Test()
   public async shouldBeAbleToResolveDependenciesUsingTheMockInjectAnnotationInTests() {
     const closure = async () => {
-      await this.import('#tests/stubs/OrderService')
+      await this.import('#tests/fixtures/OrderService')
 
       class Test {
         @MockInject(OrderService)
@@ -28,7 +28,7 @@ export default class MockInjectAnnotationTest extends BaseTest {
           this.orderServiceMock.expects('find').returns([
             { id: 1, title: 'Order 1' },
             { id: 2, title: 'Order 2' },
-            { id: 3, title: 'Order 3' },
+            { id: 3, title: 'Order 3' }
           ])
 
           /**
@@ -54,7 +54,7 @@ export default class MockInjectAnnotationTest extends BaseTest {
   @Test()
   public async shouldThrowAnErrorIfTheDependencyDoesNotHaveServiceAnnotation({ assert }: Context) {
     const closure = async () => {
-      await this.import('#tests/stubs/SumService')
+      await this.import('#tests/fixtures/SumService')
 
       class Test {
         @MockInject(SumService)

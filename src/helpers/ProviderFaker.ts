@@ -33,7 +33,7 @@ export class ProviderFaker {
   public static fakeMethod(
     alias: string,
     method: string,
-    returnValue: any,
+    returnValue: any
   ): void {
     this.boot()
 

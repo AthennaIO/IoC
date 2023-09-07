@@ -18,7 +18,7 @@ interface Product {
 export class ProductService {
   public products: Product[] = [
     { id: 1, name: 'iPhone 1' },
-    { id: 2, name: 'iPhone 2' },
+    { id: 2, name: 'iPhone 2' }
   ]
 
   public constructor() {
