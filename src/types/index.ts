@@ -7,6 +7,6 @@
  * file that was distributed with this source code.
  */
 
-export * from '#src/types/Mock'
-export * from '#src/types/FacadeType'
-export * from '#src/types/ServiceOptions'
+export * from './FacadeType.js'
+export * from './ServiceOptions.js'
+export * from './LoadModuleOptions.js'

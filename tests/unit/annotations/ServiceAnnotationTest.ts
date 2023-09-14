@@ -9,48 +9,28 @@
 
 import { Test, type Context } from '@athenna/test'
 import { BaseTest } from '#tests/helpers/BaseTest'
-import type { ProductService } from '#tests/fixtures/ProductService'
+import { Annotation } from '#src/helpers/Annotation'
+import { StringHelper } from '#tests/fixtures/StringHelper'
 
 export default class ServiceAnnotationTest extends BaseTest {
   @Test()
-  public async shouldBeAbleToRegisterDependenciesUsingServiceDecoratorAndResolveByCamelAlias({ assert }: Context) {
-    await this.import('#tests/fixtures/ProductService')
+  public async shouldBeAbleToPreregisterServicesUsingServiceAnnotation({ assert }: Context) {
+    const ProductService = await this.import('#tests/fixtures/ProductService')
 
-    const productService = ioc.use<ProductService>('productService')
+    const metadata = Annotation.getMeta(ProductService)
 
-    assert.deepEqual(productService.find(), [
-      { id: 1, name: 'iPhone 1' },
-      { id: 2, name: 'iPhone 2' },
-      { id: 3, name: 'iPhone 3' }
-    ])
+    assert.equal(metadata.type, 'transient')
+    assert.equal(metadata.camelAlias, 'productService')
+    assert.equal(metadata.alias, 'App/Services/ProductService')
+    assert.equal(metadata.isRegistered, false)
   }
 
   @Test()
-  public async shouldBeAbleToRegisterDependenciesUsingServiceDecoratorAndResolveByFullAlias({ assert }: Context) {
-    await this.import('#tests/fixtures/ProductService')
+  public async shouldNotReRegisterTheServiceIfItIsAlreadyRegisteredInTheServiceContainer({ assert }: Context) {
+    ioc.singleton('App/Services/ProductService', StringHelper).alias('productService', 'App/Services/ProductService')
 
-    const productService = ioc.use<ProductService>('App/Services/ProductService')
+    const ProductService = await this.import('#tests/fixtures/ProductService')
 
-    assert.deepEqual(productService.find(), [
-      { id: 1, name: 'iPhone 1' },
-      { id: 2, name: 'iPhone 2' },
-      { id: 3, name: 'iPhone 3' }
-    ])
-  }
-
-  @Test()
-  public async shouldNotReRegisterTheDependencyIfItIsAlreadyRegisteredInTheContainer({ assert }: Context) {
-    await this.import('#tests/fixtures/ProductService')
-
-    const productService = ioc.use<ProductService>('App/Services/ProductService')
-
-    productService.products.pop()
-
-    await this.import('#tests/fixtures/ProductService')
-
-    assert.deepEqual(productService.find(), [
-      { id: 1, name: 'iPhone 1' },
-      { id: 2, name: 'iPhone 2' }
-    ])
+    assert.isFalse(Annotation.isAnnotated(ProductService))
   }
 }

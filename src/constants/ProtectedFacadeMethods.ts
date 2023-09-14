@@ -15,10 +15,12 @@
 | The facade proxy handler methods that are restricted for Facades.
 */
 export const PROTECTED_FACADE_METHODS = [
-  'getMock',
-  'fakeMethod',
-  'restoreMethod',
-  'getFacadeAlias',
-  'getFacadeProvider',
-  'restoreAllMethods'
+  'stub',
+  'when',
+  'freeze',
+  'restore',
+  'unfreeze',
+  'getProvider',
+  'facadeAccessor',
+  'getFreezedProvider'
 ]

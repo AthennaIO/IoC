@@ -7,126 +7,155 @@
  * file that was distributed with this source code.
  */
 
-import type { Mock } from '#src/types'
-import { Ioc } from '#src/container/Ioc'
-import { Facade } from '#src/facades/Facade'
-import { Is, Module } from '@athenna/common'
-import type { FacadeType } from '#src/types/FacadeType'
+import { debug } from '#src/debug'
+import { Is } from '@athenna/common'
+import { Mock, MockBuilder, type StubInstance } from '@athenna/test'
 import { PROTECTED_FACADE_METHODS } from '#src/constants/ProtectedFacadeMethods'
-
-const require = Module.createRequire(import.meta.url)
 
 export class FacadeProxyHandler<T = any> {
   /**
-   * The container to resolve dependencies.
-   */
-  private container: Ioc
-
-  /**
    * The facade accessor that will be used
-   * to resolve the dependency inside the
+   * to resolve the service inside the
    * service container.
    */
-  private facadeAccessor: string
+  public facadeAccessor: string
 
   /**
-   * The mocked provider instance that will
-   * be used with Sinon.
+   * The service instance.
    */
-  private mockedProvider: any
+  private provider: T = null
+
+  /**
+   * The stubbed service instance.
+   */
+  private stubbed: StubInstance<T> = null
 
   /**
    * Creates a new instance of FacadeProxyHandler.
    */
-  public constructor(container: Ioc, facadeAccessor: string) {
-    this.container = container
+  public constructor(facadeAccessor: string) {
     this.facadeAccessor = facadeAccessor
   }
 
   /**
-   * Get the facade alias registered to resolve deps
-   * from the Ioc.
+   * Resolve and return the service instance
+   * of the facade.
    */
-  public getFacadeAlias(): string {
-    return this.facadeAccessor
+  public getProvider(): T {
+    return ioc.safeUse<T>(this.facadeAccessor)
   }
 
   /**
-   * Get the facade provider resolved from the Ioc.
+   * Returns the service instance registered
+   * inside the facade if exists.
    */
-  public getFacadeProvider(): T {
-    return this.container.safeUse<T>(this.facadeAccessor)
+  public getFreezedProvider(): T | null {
+    return this.provider
   }
 
   /**
-   * Set a fake return value in the Facade method.
+   * Freezes the service instance of the
+   * facade until calling `unfreeze()` method.
    */
-  public fakeMethod(method: string, returnValue: any): FacadeType<T> {
-    this.container.fakeMethod(this.facadeAccessor, method, returnValue)
-
-    return this as any
+  public freeze(): void {
+    this.provider = this.getProvider()
   }
 
   /**
-   * Restore the mocked method to his default state.
+   * Release the service instance of the
+   * facade so new instances can be created.
    */
-  public restoreMethod(method: string): FacadeType<T> {
-    this.container.restoreMethod(this.facadeAccessor, method)
-
-    return this as any
+  public unfreeze(): void {
+    this.provider = null
   }
 
   /**
-   * Restore all the mocked methods of this facade to
-   * their default state.
+   * Resolves a service instance of the
+   * facade and save it to be used instead of the
+   * original one.
    */
-  public restoreAllMethods(): FacadeType<T> {
-    this.container.restoreAllMethods(this.facadeAccessor)
+  public stub(): StubInstance<T> {
+    this.provider = this.getProvider()
+    this.stubbed = Mock.stub(this.provider)
 
-    return this as any
+    return this.stubbed
   }
 
   /**
-   * Return a sinon mock instance.
+   * Create a mock builder instance for the given method
+   * of the facade.
    */
-  public getMock(): Mock {
-    const sinon = require('sinon')
+  public when(method: keyof T): MockBuilder {
+    this.provider = this.getProvider()
 
-    this.mockedProvider = this.getFacadeProvider()
+    const stub = Mock.when<T>(this.provider, method)
 
-    return new Proxy(sinon.mock(this.mockedProvider), {
-      get: (mock, method) => {
-        if (method === 'verify') {
-          this.mockedProvider = null
-        }
-
-        return mock[method]
-      }
-    })
+    return stub
   }
 
   /**
-   * Method called by Proxy everytime a new property is called.
+   * Restore the facade to the original state
+   * by removing the stubbed instance.
    */
-  public get(facade: typeof Facade, key: string): any {
-    if (PROTECTED_FACADE_METHODS.includes(key)) {
-      return this[key].bind(this)
-    }
-
-    if (this.mockedProvider) {
-      return this.mockedProvider[key]
-    }
-
-    return this.__callStatic(facade, key)
+  public restore(): void {
+    this.stubbed = null
+    this.provider = null
   }
 
   /**
+   * Method called by Proxy every time that a value is changed.
    * Returns the provider method with a Proxy applied in apply.
    * This way we guarantee that we are working with
    * the same instance when a Facade method returns this.
    */
-  public __callStatic(facade: typeof Facade, key: string): any {
-    const provider = facade.container.safeUse(this.facadeAccessor)
+  public set(_, key: string, value: any): boolean {
+    if (this.stubbed) {
+      this.stubbed[key] = value
+
+      return true
+    }
+
+    if (this.provider) {
+      this.provider[key] = value
+
+      return true
+    }
+
+    const provider = this.getProvider()
+
+    provider[key] = value
+
+    return true
+  }
+
+  /**
+   * Method called by Proxy every time a new property is called.
+   * Returns the provider method with a Proxy applied in apply.
+   * This way we guarantee that we are working with
+   * the same instance when a Facade method returns this.
+   */
+  public get(_, key: string): any {
+    if (PROTECTED_FACADE_METHODS.includes(key)) {
+      debug('Restricted facade method executed: %s', key)
+
+      const method = this[key]
+
+      if (!Is.Function(method)) {
+        return method
+      }
+
+      return this[key].bind(this)
+    }
+
+    if (this.stubbed) {
+      return this.stubbed[key]
+    }
+
+    if (this.provider) {
+      return this.provider[key]
+    }
+
+    const provider = this.getProvider()
 
     if (provider[key] === undefined) {
       return undefined

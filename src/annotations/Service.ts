@@ -10,57 +10,32 @@
 import 'reflect-metadata'
 
 import { debug } from '#src/debug'
-import { Options } from '@athenna/common'
-import type { ServiceOptions } from '#src/types/ServiceOptions'
+import type { ServiceOptions } from '#src'
+import { String, Options } from '@athenna/common'
+import { Annotation } from '#src/helpers/Annotation'
 
 /**
- * Create a service inside the service provider.
+ * Create a service inside the service.
  */
 export function Service(options?: ServiceOptions): ClassDecorator {
   return (target: any) => {
     options = Options.create(options, {
+      type: 'transient',
       alias: `App/Services/${target.name}`,
-      type: 'transient'
+      camelAlias: String.toCamelCase(target.name)
     })
 
-    const alias = options.alias
-    const createCamelAlias = true
+    debug('Registering service in the service container %o', {
+      name: target.name,
+      ...options
+    })
 
-    debug(
-      'Registering %s dependency as a %s in the service container with %s alias.',
-      target.name,
-      options.type,
-      alias
-    )
-
-    if (ioc.hasDependency(alias)) {
-      debug(
-        'Dependency with alias %s already exists in the service provider, skipping registration of %s dependency.',
-        alias,
-        target.name
-      )
-
-      defineMetadata(target, options)
+    if (ioc.has(options.alias) || ioc.has(options.camelAlias)) {
+      debug('Skipping registration, service is already registered.')
 
       return
     }
 
-    ioc[options.type](alias, target, createCamelAlias)
-
-    debug(
-      'Dependency %s with alias %s registered in the service container as a %s dependency.',
-      target.name,
-      alias,
-      options.type
-    )
-
-    defineMetadata(target, options)
+    Annotation.defineServiceMeta(target, options)
   }
-}
-
-export function defineMetadata(target: any, options: ServiceOptions) {
-  Reflect.defineMetadata('ioc:registered', true, target)
-  Reflect.defineMetadata('ioc:type', options.type, target)
-  Reflect.defineMetadata('ioc:alias', options.alias, target)
-  Reflect.defineMetadata('ioc:camelAlias', options.alias, target)
 }

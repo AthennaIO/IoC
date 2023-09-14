@@ -8,6 +8,7 @@
  */
 
 import { Ioc } from '#src'
+import { Module } from '@athenna/common'
 import { AfterEach } from '@athenna/test'
 
 export class BaseTest {
@@ -21,6 +22,6 @@ export class BaseTest {
   }
 
   public async import(module: string) {
-    return import(`${module}.js?version=${Math.random()}`)
+    return Module.get(import(`${module}.js?version=${Math.random()}`))
   }
 }

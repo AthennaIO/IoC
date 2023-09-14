@@ -10,35 +10,21 @@
 import 'reflect-metadata'
 
 import { debug } from '#src/debug'
-import { MissingServiceAnnotationException } from '#src/exceptions/MissingServiceAnnotationException'
+import { Facade } from '#src/facades/Facade'
 
 /**
- * Inject some dependency of the service container in some property.
+ * Inject some service in a class property.
  */
 export function Inject(alias?: string): PropertyDecorator {
   return (target: any, key: string | symbol) => {
-    if (!alias) {
-      alias = key as string
-    }
+    alias = alias || (key as string)
 
-    debug(
-      'Injecting %s dependency alias in %s dependency.',
+    debug('Injecting service %o', {
       alias,
-      target.constructor.name
-    )
+      target: target.constructor.name,
+      targetKey: key
+    })
 
-    const dependency = ioc.safeUse(alias)
-
-    if (!Reflect.hasMetadata('ioc:registered', dependency.constructor)) {
-      throw new MissingServiceAnnotationException(dependency.constructor.name)
-    }
-
-    debug(
-      'Dependency alias %s injected in %s dependency.',
-      alias,
-      target.constructor.name
-    )
-
-    Object.defineProperty(target, key, { value: dependency })
+    Object.defineProperty(target, key, { value: Facade.createFor(alias) })
   }
 }

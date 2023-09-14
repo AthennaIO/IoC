@@ -7,6 +7,7 @@
  * file that was distributed with this source code.
  */
 
-import type { SinonMock } from 'sinon'
-
-export type Mock = SinonMock
+export const IOC_ALIAS = 'ioc:alias'
+export const IOC_TYPE = 'ioc:type'
+export const IOC_REGISTERED = 'ioc:registered'
+export const IOC_CAMEL_ALIAS = 'ioc:camelAlias'
