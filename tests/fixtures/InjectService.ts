@@ -7,7 +7,7 @@
  * file that was distributed with this source code.
  */
 
-import { Inject, Service } from '#src'
+import { Inject } from '#src'
 import { ClientService } from './ClientService.js'
 import { type User, UserService } from './UserService.js'
 
@@ -16,7 +16,6 @@ export interface Client {
   name: string
 }
 
-@Service()
 export class InjectService {
   @Inject('App/Services/UserService')
   private userService: UserService

@@ -10,25 +10,25 @@
 import { Facade } from '#src'
 import { BaseTest } from '#tests/helpers/BaseTest'
 import { SumService } from '#tests/fixtures/SumService'
-import { REAL_METHODS } from '#src/constants/RealMethods'
 import { Test, BeforeEach, type Context } from '@athenna/test'
 
 export default class FacadeTest extends BaseTest {
   @BeforeEach()
   public async beforeEach() {
-    ioc.bind('Athenna/Services/SumService', SumService)
+    ioc.bind('SumService', SumService)
+    ioc.singleton('SumServiceSingleton', SumService)
   }
 
   @Test()
   public async shouldBeAbleToGetTheFacadeAlias({ assert }: Context) {
-    const Sum = Facade.createFor<SumService>('Athenna/Services/SumService')
+    const Sum = Facade.createFor<SumService>('SumService')
 
-    assert.deepEqual(Sum.getFacadeAlias(), 'Athenna/Services/SumService')
+    assert.deepEqual(Sum.facadeAccessor, 'SumService')
   }
 
   @Test()
   public async shouldBeAbleToCreateANewFacadeForSumService({ assert }: Context) {
-    const Sum = Facade.createFor<SumService>('Athenna/Services/SumService')
+    const Sum = Facade.createFor<SumService>('SumService')
 
     assert.equal(Sum.get(), 0)
     assert.equal(Sum.number, 0)
@@ -40,7 +40,7 @@ export default class FacadeTest extends BaseTest {
 
   @Test()
   public async shouldBeAbleToSaveInstancesForLaterUsageUsingFacades({ assert }: Context) {
-    const Sum = Facade.createFor<SumService>('Athenna/Services/SumService')
+    const Sum = Facade.createFor<SumService>('SumService')
 
     const sum = await Sum.set(10).set(10).setAsync(10)
 
@@ -49,52 +49,126 @@ export default class FacadeTest extends BaseTest {
   }
 
   @Test()
+  public async shouldBeAbleToFreezeAndUnfreezeTheServiceInstanceInTheFacade({ assert }: Context) {
+    const Sum = Facade.createFor<SumService>('SumService')
+
+    Sum.freeze()
+    Sum.number = 1000
+
+    assert.deepEqual(Sum.number, 1000)
+
+    Sum.unfreeze()
+
+    assert.deepEqual(Sum.number, 0)
+  }
+
+  @Test()
+  public async shouldBeAbleToGetTheFreezedServiceInstanceWhenFreezingIt({ assert }: Context) {
+    const Sum = Facade.createFor<SumService>('SumService')
+
+    Sum.freeze()
+
+    const sumService = Sum.getFreezedProvider()
+
+    assert.deepEqual(sumService.get(), 0)
+  }
+
+  @Test()
+  public async shouldBeAbleToSetValuesInTheFacadesProperties({ assert }: Context) {
+    const Sum = Facade.createFor<SumService>('SumServiceSingleton')
+
+    Sum.number = 1000
+
+    assert.equal(Sum.number, 1000)
+  }
+
+  @Test()
+  public async shouldBeAbleToSetValuesInTheFacadeStubbedInstanceProperties({ assert }: Context) {
+    const Sum = Facade.createFor<SumService>('SumService')
+
+    Sum.stub()
+    Sum.number = 1000
+
+    Sum.get = function () {
+      return this.number + 1
+    }
+
+    assert.equal(Sum.get(), 1001)
+    assert.equal(Sum.number, 1000)
+  }
+
+  @Test()
+  public async shouldBeAbleToSetValuesInTheFacadeServiceProperties({ assert }: Context) {
+    const Sum = Facade.createFor<SumService>('SumService')
+
+    Sum.stub()
+    Sum.number = 1000
+
+    Sum.get = function () {
+      return this.number + 1
+    }
+
+    assert.equal(Sum.get(), 1001)
+    assert.equal(Sum.number, 1000)
+  }
+
+  @Test()
   public async shouldReturnUndefinedWhenTheProviderKeyDoesNotExist({ assert }: Context) {
-    const Sum = Facade.createFor<any>('Athenna/Services/SumService')
+    const Sum = Facade.createFor<any>('SumService')
 
     assert.isUndefined(Sum.undefinedProperty)
   }
 
   @Test()
-  public async shouldBeAbleToMockAndRestoreFacadeMethods({ assert }: Context) {
-    const Sum = Facade.createFor<any>('Athenna/Services/SumService')
+  public async shouldBeAbleToCreateAStubForTheFacade({ assert }: Context) {
+    const Sum = Facade.createFor<SumService>('SumService')
 
-    Sum.fakeMethod('get', function (n = 0) {
-      return this.number + n + 10
-    })
+    const stub = Sum.stub()
 
-    const mock = Sum.getMock()
+    stub.get.returns(100)
 
-    mock.expects('get').exactly(1).returns(10)
+    assert.deepEqual(Sum.get(), 100)
+    assert.returned(stub.get, 100)
 
-    assert.deepEqual(Sum.get(), 10)
-    mock.verify()
-    assert.deepEqual(Sum.get(1), 11)
-
-    Sum.restoreMethod('get')
+    Sum.restore()
 
     assert.deepEqual(Sum.get(), 0)
   }
 
   @Test()
-  public async shouldBeAbleToRemoveAllMockedMethodsFromTheFacadeAtOneTime({ assert }: Context) {
-    const Sum = Facade.createFor<SumService>('Athenna/Services/SumService')
+  public async shouldBeAbleToGetTheFreezedServiceInstanceWhenStubbingIt({ assert }: Context) {
+    const Sum = Facade.createFor<SumService>('SumService')
 
-    Sum.fakeMethod('get', () => 1)
-      .fakeMethod('sum', number => number + 1)
-      .fakeMethod('setAsync', () => Sum)
+    const stub = Sum.stub()
 
-    assert.deepEqual(REAL_METHODS.size, 3)
+    stub.get.returns(100)
 
-    Sum.restoreAllMethods()
+    assert.deepEqual(Sum.get(), 100)
+    assert.returned(stub.get, 100)
+    assert.calledTimes(stub.get, 1)
 
-    assert.deepEqual(REAL_METHODS.size, 0)
+    const sumService = Sum.getFreezedProvider()
+
+    assert.deepEqual(sumService.get(), 100)
+    assert.returned(stub.get, 100)
+    assert.calledTimes(stub.get, 2)
+
+    Sum.restore()
+
+    assert.deepEqual(Sum.get(), 0)
   }
 
   @Test()
-  public async shouldBeAbleToCallRestoreMethodEvenIfTheMethodIsNotMocked({ assert }: Context) {
-    const Sum = Facade.createFor<SumService>('Athenna/Services/SumService')
+  public async shouldBeAbleToCreateStubsForFacadeMethods({ assert }: Context) {
+    const Sum = Facade.createFor<SumService>('SumService')
 
-    assert.doesNotThrows(() => Sum.restoreMethod('not-found'))
+    const stub = Sum.when('get').return(100)
+
+    assert.deepEqual(Sum.get(), 100)
+    assert.returned(stub, 100)
+
+    Sum.restore()
+
+    assert.deepEqual(Sum.get(), 0)
   }
 }

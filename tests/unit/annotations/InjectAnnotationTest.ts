@@ -7,75 +7,27 @@
  * file that was distributed with this source code.
  */
 
-import { Inject } from '#src'
 import { Test, type Context } from '@athenna/test'
 import { BaseTest } from '#tests/helpers/BaseTest'
-import type { InjectService } from '#tests/fixtures/InjectService'
-import { NotFoundDependencyException } from '#src/exceptions/NotFoundDependencyException'
-import { MissingServiceAnnotationException } from '#src/exceptions/MissingServiceAnnotationException'
+import { NotFoundServiceException } from '#src/exceptions/NotFoundServiceException'
 
 export default class InjectAnnotationTest extends BaseTest {
   @Test()
-  public async shouldBeAbleToResolveDependenciesUsingTheInjectAnnotation({ assert }: Context) {
-    await this.import('#tests/fixtures/ClientService')
-    await this.import('#tests/fixtures/UserService')
-    await this.import('#tests/fixtures/InjectService')
+  public async shouldBeAbleToPreregisterServicesUsingInjectAnnotation({ assert }: Context) {
+    const InjectService = await this.import('#tests/fixtures/InjectService')
 
-    const injectService = ioc.use<InjectService>('injectService')
+    const injectService = new InjectService()
 
-    assert.deepEqual(injectService.findClients(), [
-      {
-        id: 1,
-        name: 'LinkApi'
-      },
-      {
-        id: 2,
-        name: 'Semantix'
-      }
-    ])
+    assert.isDefined(injectService.userService)
+    assert.isDefined(injectService.clientService)
   }
 
   @Test()
-  public async shouldBeAbleToResolveDependenciesAliasUsingTheInjectAnnotation({ assert }: Context) {
-    await this.import('#tests/fixtures/ClientService')
-    await this.import('#tests/fixtures/UserService')
-    await this.import('#tests/fixtures/InjectService')
+  public async shouldThrowExceptionIfTryingToUseAServiceThatIsOnlyPreregistered({ assert }: Context) {
+    const InjectService = await this.import('#tests/fixtures/InjectService')
 
-    const injectService = ioc.use<InjectService>('injectService')
+    const injectService = new InjectService()
 
-    assert.deepEqual(injectService.findOneUser(), {
-      id: 1,
-      name: 'João',
-      clients: [
-        { id: 1, name: 'LinkApi' },
-        { id: 2, name: 'Semantix' }
-      ]
-    })
-  }
-
-  @Test()
-  public async shouldThrowExceptionWhenTryingToResolveADependencyThatDoesNotExist({ assert }: Context) {
-    assert.throws(() => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      class Test {
-        @Inject('NotFound/Alias')
-        public notFound: any
-      }
-    }, NotFoundDependencyException)
-  }
-
-  @Test()
-  public async shouldThrowExceptionWhenTryingToResolveADependencyThatDoesNotHaveServiceAnnotationPresent({
-    assert
-  }: Context) {
-    ioc.singleton('missingAnnotationService', () => 'hello')
-
-    assert.throws(() => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      class Test {
-        @Inject()
-        public missingAnnotationService: any
-      }
-    }, MissingServiceAnnotationException)
+    assert.throws(() => injectService.findClients(), NotFoundServiceException)
   }
 }

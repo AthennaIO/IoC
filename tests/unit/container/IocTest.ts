@@ -8,16 +8,16 @@
  */
 
 import { Exec, Module } from '@athenna/common'
-import { Test, type Context } from '@athenna/test'
 import { BaseTest } from '#tests/helpers/BaseTest'
+import { Test, type Context } from '@athenna/test'
 import { UserService } from '#tests/fixtures/UserService'
 import { ClientService } from '#tests/fixtures/ClientService'
 import { ClientServiceMock } from '#tests/fixtures/ClientServiceMock'
-import { NotFoundDependencyException } from '#src/exceptions/NotFoundDependencyException'
+import { NotFoundServiceException } from '#src/exceptions/NotFoundServiceException'
 
 export default class IocTest extends BaseTest {
   @Test()
-  public async shouldBeAbleToRegisterTransientDependenciesInsideTheContainer({ assert }: Context) {
+  public async shouldBeAbleToRegisterTransientServicesInsideTheContainer({ assert }: Context) {
     container.transient('Services/ClientService', ClientService)
 
     const clientServiceOne = container.safeUse<ClientService>('Services/ClientService')
@@ -28,7 +28,7 @@ export default class IocTest extends BaseTest {
   }
 
   @Test()
-  public async shouldBeAbleToRegisterSingletonDependenciesInsideTheContainer({ assert }: Context) {
+  public async shouldBeAbleToRegisterSingletonServicesInsideTheContainer({ assert }: Context) {
     container.singleton('Services/ClientService', ClientService)
 
     const clientServiceOne = container.safeUse<ClientService>('Services/ClientService')
@@ -39,7 +39,7 @@ export default class IocTest extends BaseTest {
   }
 
   @Test()
-  public async shouldBeAbleToUseBindMethodToRegisterTransientDependenciesInsideTheContainer({ assert }: Context) {
+  public async shouldBeAbleToUseBindMethodToRegisterTransientServicesInsideTheContainer({ assert }: Context) {
     container.transient('Services/ClientService', ClientService)
 
     const clientServiceOne = container.safeUse<ClientService>('Services/ClientService')
@@ -50,30 +50,29 @@ export default class IocTest extends BaseTest {
   }
 
   @Test()
-  public async shouldBeAbleToListDependenciesOfTheContainer({ assert }: Context) {
+  public async shouldBeAbleToListServicesOfTheContainer({ assert }: Context) {
     container.transient('Services/UserService', UserService)
     container.singleton('Services/ClientService', ClientService)
 
     const dependencies = container.list()
 
     assert.isObject(dependencies)
-    assert.lengthOf(Object.keys(dependencies), 4)
+    assert.lengthOf(Object.keys(dependencies), 2)
   }
 
   @Test()
-  public async shouldBeAbleToGetTheRegistrationObjectOfTheDependency({ assert }: Context) {
+  public async shouldBeAbleToGetTheRegistrationObjectOfTheService({ assert }: Context) {
     container.bind('Services/UserService', UserService)
 
     const registration = container.getRegistration('Services/UserService')
 
     assert.deepEqual(registration.lifetime, 'TRANSIENT')
-    assert.deepEqual(registration.hasCamelAlias, true)
   }
 
   @Test()
   public async shouldCreateAnAliasForTheAlias({ assert }: Context) {
-    container.singleton('Services/ClientService', ClientService)
-    container.singleton('Services/UserService', UserService)
+    container.singleton('Services/ClientService', ClientService).alias('clientService', 'Services/ClientService')
+    container.singleton('Services/UserService', UserService).alias('userService', 'Services/UserService')
 
     const userService = container.safeUse('userService')
 
@@ -81,9 +80,9 @@ export default class IocTest extends BaseTest {
   }
 
   @Test()
-  public async shouldBeAbleToOverrideDependencies({ assert }: Context) {
+  public async shouldBeAbleToOverrideServicesAndItSubAliases({ assert }: Context) {
     container.singleton('Services/ClientService', ClientService)
-    container.singleton('Services/UserService', UserService)
+    container.singleton('Services/UserService', UserService).alias('userService', 'Services/UserService')
     container.singleton('Services/UserService', ClientService)
 
     const clientService = container.safeUse('Services/UserService')
@@ -102,9 +101,9 @@ export default class IocTest extends BaseTest {
   }
 
   @Test()
-  public async shouldBeAbleToUseOtherProvidersInsideServices({ assert }: Context) {
-    container.singleton('Services/ClientService', ClientService)
-    container.singleton('Services/UserService', UserService)
+  public async shouldBeAbleToUseOtherServicesInsideServices({ assert }: Context) {
+    container.singleton('Services/ClientService', ClientService).alias('clientService', 'Services/ClientService')
+    container.singleton('Services/UserService', UserService).alias('userService', 'Services/UserService')
 
     const userService = container.safeUse('userService')
 
@@ -113,7 +112,7 @@ export default class IocTest extends BaseTest {
   }
 
   @Test()
-  public async shouldBeAbleToCreateAliasFromOtherProvidersInTheIoc({ assert }: Context) {
+  public async shouldBeAbleToCreateAliasFromOtherServicesInTheIoc({ assert }: Context) {
     container
       .singleton('Services/ClientService', ClientService)
       .alias('Services/Aliases/ClientService', 'Services/ClientService')
@@ -124,19 +123,19 @@ export default class IocTest extends BaseTest {
   }
 
   @Test()
-  public async shouldReturnUndefinedWhenTheDependencyDoesNotExist({ assert }: Context) {
+  public async shouldReturnUndefinedWhenTheServiceDoesNotExist({ assert }: Context) {
     const clientService = container.use('Services/ClientService')
 
     assert.isUndefined(clientService)
   }
 
   @Test()
-  public async shouldThrowAnErrorWhenTryingToUseADependencyThatDoesNotExist({ assert }: Context) {
+  public async shouldThrowAnErrorWhenTryingToUseAServiceThatDoesNotExist({ assert }: Context) {
     container.singleton('Services/ClientService', ClientService)
 
     const useCase = () => container.safeUse('Services/Aliases/ClientService')
 
-    assert.throws(useCase, NotFoundDependencyException)
+    assert.throws(useCase, NotFoundServiceException)
   }
 
   @Test()
@@ -151,7 +150,7 @@ export default class IocTest extends BaseTest {
   }
 
   @Test()
-  public async shouldBeAbleToClearTheFakeDependenciesFromTheContainer({ assert }: Context) {
+  public async shouldBeAbleToClearTheFakeServicesFromTheContainer({ assert }: Context) {
     container.fake('Services/ClientService', ClientServiceMock)
     container.unfake('Services/ClientService')
     container.singleton('Services/ClientService', ClientService) // This call will replace ClientServiceMock.
@@ -163,7 +162,7 @@ export default class IocTest extends BaseTest {
   }
 
   @Test()
-  public async shouldBeAbleToClearAllTheFakeDependenciesFromTheContainer({ assert }: Context) {
+  public async shouldBeAbleToClearAllTheFakeServicesFromTheContainer({ assert }: Context) {
     container.fake('Services/ClientService', ClientServiceMock)
     container.clearAllFakes()
     container.singleton('Services/ClientService', ClientService) // This call will replace ClientServiceMock.
@@ -175,14 +174,14 @@ export default class IocTest extends BaseTest {
   }
 
   @Test()
-  public async shouldThrowANotFoundDependencyExceptionWhenAliasDoesntExist({ assert }: Context) {
+  public async shouldThrowANotFoundServiceExceptionWhenAliasDoesntExist({ assert }: Context) {
     const useCase = () => container.alias('Alias', 'OtherAlias')
 
-    assert.throws(useCase, NotFoundDependencyException)
+    assert.throws(useCase, NotFoundServiceException)
   }
 
   @Test()
-  public async shouldBeAbleToRegisterDependenciesAsPromises({ assert }: Context) {
+  public async shouldBeAbleToRegisterServicesAsPromises({ assert }: Context) {
     container.transient('Services/ClientService', Module.get(import('#tests/fixtures/ClientService')))
 
     await Exec.sleep(10)
@@ -193,5 +192,31 @@ export default class IocTest extends BaseTest {
       { id: 1, name: 'LinkApi' },
       { id: 2, name: 'Semantix' }
     ])
+  }
+
+  @Test()
+  public async shouldBeAbleToRegisterAServiceByPath({ assert }: Context) {
+    await container.loadModule(Path.fixtures('StringHelper.ts'))
+
+    assert.isTrue(container.has('stringHelper'))
+    assert.isTrue(container.has('App/Services/StringHelper'))
+  }
+
+  @Test()
+  public async shouldBeAbleToRegisterAnAnnotatedServiceByPath({ assert }: Context) {
+    await container.loadModule(Path.fixtures('ClientService.ts'))
+
+    assert.isTrue(container.has('clientService'))
+    assert.isTrue(container.has('App/Services/ClientService'))
+  }
+
+  @Test()
+  public async shouldBeAbleToRegisterMultiplesServicePaths({ assert }: Context) {
+    await container.loadModules([Path.fixtures('StringHelper.ts'), Path.fixtures('ClientService.ts')])
+
+    assert.isTrue(container.has('stringHelper'))
+    assert.isTrue(container.has('App/Services/StringHelper'))
+    assert.isTrue(container.has('clientService'))
+    assert.isTrue(container.has('App/Services/ClientService'))
   }
 }

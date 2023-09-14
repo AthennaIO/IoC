@@ -13,25 +13,25 @@ import {
   asValue,
   asFunction,
   InjectionMode,
-  createContainer
-} from 'awilix'
-
-import type {
-  Resolver,
-  AwilixContainer,
-  RegistrationHash,
-  ContainerOptions
+  createContainer,
+  type Resolver,
+  type AwilixContainer,
+  type RegistrationHash,
+  type ContainerOptions
 } from 'awilix'
 
 import { debug } from '#src/debug'
-import { String, Options, Is } from '@athenna/common'
-import { ProviderFaker } from '#src/helpers/ProviderFaker'
-import { NotFoundDependencyException } from '#src/exceptions/NotFoundDependencyException'
+import { pathToFileURL } from 'node:url'
+import type { LoadModuleOptions } from '#src'
+import { Annotation } from '#src/helpers/Annotation'
+import { Is, Exec, String, Module, Options } from '@athenna/common'
+import { NotFoundServiceException } from '#src/exceptions/NotFoundServiceException'
 
 export class Ioc {
   /**
-   * Hold all the dependencies that are fakes. The fake
-   * dependencies will never be replaced if its alias exists here.
+   * Hold all the services that are fakes. The fake
+   * services will never be replaced if its alias
+   * exists here.
    */
   public static fakes: string[] = []
 
@@ -76,30 +76,14 @@ export class Ioc {
   }
 
   /**
-   * Return the registration of the dependency.
+   * Return the registration of the service.
    */
-  public getRegistration<T = any>(
-    alias: string
-  ): Resolver<T> & { hasCamelAlias: boolean } {
-    const registration = Ioc.container.getRegistration(alias) as Resolver<T> & {
-      hasCamelAlias: boolean
-    }
-
-    registration.hasCamelAlias = false
-
-    if (alias.includes('/')) {
-      const aliasOfAlias = alias.split('/').pop()
-
-      if (Ioc.container.hasRegistration(String.toCamelCase(aliasOfAlias))) {
-        registration.hasCamelAlias = true
-      }
-    }
-
-    return registration
+  public getRegistration<T = any>(alias: string): Resolver<T> {
+    return Ioc.container.getRegistration(alias)
   }
 
   /**
-   * Resolve a service provider from the container or
+   * Resolve a service from the container or
    * returns undefined if not found.
    */
   public use<T = any>(alias: string): T {
@@ -107,101 +91,92 @@ export class Ioc {
   }
 
   /**
-   * Resolve a service provider from the container or
+   * Resolve a service from the container or
    * throws exception if not found.
    */
   public safeUse<T = any>(alias: string): T {
-    if (!this.hasDependency(alias)) {
-      throw new NotFoundDependencyException(alias)
+    if (!this.has(alias)) {
+      throw new NotFoundServiceException(alias)
     }
 
     return Ioc.container.resolve<T>(alias)
   }
 
   /**
-   * Register and alias to another dependency alias of the
-   * container.
+   * Register an alias to another service alias.
    */
-  public alias(alias: string, dependencyAlias: string): Ioc {
-    if (!this.hasDependency(dependencyAlias)) {
-      throw new NotFoundDependencyException(dependencyAlias)
+  public alias(subAlias: string, originalAlias: string): Ioc {
+    if (!this.has(originalAlias)) {
+      throw new NotFoundServiceException(originalAlias)
     }
 
-    debug('Registering alias %s to %s alias.', alias, dependencyAlias)
+    debug(
+      'Registering sub alias %s to %s original alias.',
+      subAlias,
+      originalAlias
+    )
 
-    Ioc.container.register(alias, aliasTo(dependencyAlias))
+    Ioc.container.register(subAlias, aliasTo(originalAlias))
 
     return this
   }
 
   /**
-   * Bind a transient dependency to the container.
-   * Transient dependencies will always resolve a new
+   * Bind a transient service to the container.
+   * Transient services will always resolve a new
    * instance of it every time you (or Athenna internally)
    * call ".use" or ".safeUse" method.
    */
-  public bind(alias: string, dependency: any, createCamelAlias = true): Ioc {
-    this.register(alias, dependency, { type: 'transient', createCamelAlias })
+  public bind(alias: string, service: any): Ioc {
+    this.register(alias, service, { type: 'transient' })
 
     return this
   }
 
   /**
-   * Bind a transient dependency to the container.
-   * Transient dependencies will always resolve a new
+   * Bind a transient service to the container.
+   * Transient services will always resolve a new
    * instance of it every time you (or Athenna internally)
    * call ".use" or ".safeUse" method.
    */
-  public transient(
-    alias: string,
-    dependency: any,
-    createCamelAlias = true
-  ): Ioc {
-    this.register(alias, dependency, { type: 'transient', createCamelAlias })
+  public transient(alias: string, service: any): Ioc {
+    this.register(alias, service, { type: 'transient' })
 
     return this
   }
 
   /**
-   * Bind an instance dependency to the container.
-   * Instance dependencies have the same behavior of
-   * singleton dependencies, but you will have more control
-   * on how you want to create your dependency constructor.
+   * Bind an instance service to the container.
+   * Instance services have the same behavior of
+   * singleton services, but you will have more control
+   * on how you want to create your service constructor.
    */
-  public instance(
-    alias: string,
-    dependency: any,
-    createCamelAlias = true
-  ): Ioc {
-    this.register(alias, dependency, { type: 'singleton', createCamelAlias })
+  public instance(alias: string, service: any): Ioc {
+    this.register(alias, service, { type: 'singleton' })
 
     return this
   }
 
   /**
-   * Bind a singleton dependency to the container.
-   * Singleton dependencies will always resolve the same
+   * Bind a singleton service to the container.
+   * Singleton services will always resolve the same
    * instance of it every time you (or Athenna internally)
    * call ".use" or ".safeUse" method.
    */
-  public singleton(
-    alias: string,
-    dependency: any,
-    createCamelAlias = true
-  ): Ioc {
-    this.register(alias, dependency, { type: 'singleton', createCamelAlias })
+  public singleton(alias: string, service: any): Ioc {
+    this.register(alias, service, { type: 'singleton' })
 
     return this
   }
 
   /**
-   * Bind a fake dependency to the container.
-   * Fake dependencies will not let the container
-   * re-register the dependency alias until you call
+   * Bind a fake service to the container.
+   * Fake services will not let the container
+   * re-register the service alias until you call
    * "ioc.unfake()" method.
    */
-  public fake(alias: string, dependency: any, createCamelAlias = true): Ioc {
-    this.register(alias, dependency, { type: 'singleton', createCamelAlias })
+  public fake(alias: string, service: any): Ioc {
+    this.register(alias, service, { type: 'singleton' })
 
     Ioc.fakes.push(alias)
 
@@ -209,7 +184,7 @@ export class Ioc {
   }
 
   /**
-   * Remove the fake dependency from fakes map.
+   * Remove the fake service from fakes map.
    */
   public unfake(alias: string): Ioc {
     const index = Ioc.fakes.indexOf(alias)
@@ -222,7 +197,7 @@ export class Ioc {
   }
 
   /**
-   * Remove all fake dependencies from fakes array.
+   * Remove all fake services from fakes array.
    */
   public clearAllFakes(): Ioc {
     Ioc.fakes = []
@@ -231,63 +206,80 @@ export class Ioc {
   }
 
   /**
-   * Verify if dependency alias is fake or not.
+   * Verify if service alias is fake or not.
    */
   public isFaked(alias: string): boolean {
     return Ioc.fakes.includes(alias)
   }
 
   /**
-   * Register a fake method to the dependency.
+   * Verify if the container has the service or not.
    */
-  public fakeMethod(alias: string, method: string, returnValue: any): Ioc {
-    ProviderFaker.fakeMethod(alias, method, returnValue)
-
-    return this
-  }
-
-  /**
-   * Restore the dependency method to the default state.
-   */
-  public restoreMethod(alias: string, method: string): Ioc {
-    ProviderFaker.restoreMethod(alias, method)
-
-    return this
-  }
-
-  /**
-   * Restore all the dependency methods to the default state.
-   */
-  public restoreAllMethods(alias: string): Ioc {
-    ProviderFaker.restoreAllMethods(alias)
-
-    return this
-  }
-
-  /**
-   * Verify if the container has the dependency or not.
-   */
-  public hasDependency(alias: string): boolean {
+  public has(alias: string): boolean {
     return Ioc.container.hasRegistration(alias)
   }
 
   /**
+   * Import and register a module found in the determined
+   * path.
+   */
+  public async loadModule(
+    path: string,
+    options: LoadModuleOptions = {}
+  ): Promise<void> {
+    options = Options.create(options, {
+      addCamelAlias: true,
+      metaUrl: pathToFileURL(Path.pwd()).href
+    })
+
+    const versionedPath = `${path}?version=${Math.random()}`
+    const Service = await Module.resolve(versionedPath, options.metaUrl)
+    const meta = Annotation.getMeta(Service)
+
+    this[meta.type](meta.alias)
+    Annotation.defineAsRegistered(Service)
+
+    if (meta.alias.includes('/') && options.addCamelAlias && !meta.camelAlias) {
+      const subAlias = meta.alias.split('/').pop()
+
+      this.alias(String.toCamelCase(subAlias), meta.alias)
+    }
+
+    if (meta.camelAlias) {
+      this.alias(meta.camelAlias, meta.alias)
+    }
+  }
+
+  /**
+   * Import and register all the files found in all
+   * the determined paths.
+   */
+  public async loadModules(
+    paths: string[],
+    options: LoadModuleOptions = {}
+  ): Promise<void> {
+    await Exec.concurrently(paths, async path => {
+      await this.loadModule(path, options)
+    })
+  }
+
+  /**
    * Get the Awilix binder based on the type of the
-   * dependency.
+   * service.
    */
   private getAwilixBinder(
     type: 'transient' | 'scoped' | 'singleton',
-    dependency: any
+    service: any
   ): any {
-    if (Is.Class(dependency)) {
-      return asClass(dependency)[type]()
+    if (Is.Class(service)) {
+      return asClass(service)[type]()
     }
 
-    if (Is.Function(dependency)) {
-      return asFunction(dependency)[type]()
+    if (Is.Function(service)) {
+      return asFunction(service)[type]()
     }
 
-    return asValue(dependency)
+    return asValue(service)
   }
 
   /**
@@ -295,48 +287,44 @@ export class Ioc {
    */
   private register(
     alias: string,
-    dependency: any,
+    service: any,
     options: {
       type?: 'transient' | 'scoped' | 'singleton'
-      createCamelAlias?: boolean
     }
   ): void {
     if (this.isFaked(alias)) {
       return
     }
 
-    options = Options.create(options, {
-      type: 'transient',
-      createCamelAlias: true
-    })
+    options = Options.create(options, { type: 'transient' })
 
     /**
      * Saving the logic inside the function to reuse the code
-     * for promises and no promises dependencies.
+     * for promises and no promises services.
      */
-    const register = dep => {
-      const binder = this.getAwilixBinder(options.type, dep)
+    const register = service => {
+      const binder = this.getAwilixBinder(options.type, service)
+
+      debug('Registering service: %o', {
+        name: service?.name,
+        type: options.type,
+        alias
+      })
 
       Ioc.container.register(alias, binder)
-
-      if (alias.includes('/') && options.createCamelAlias) {
-        const aliasOfAlias = alias.split('/').pop()
-
-        this.alias(String.toCamelCase(aliasOfAlias), alias)
-      }
     }
 
-    if (dependency && dependency.then) {
+    if (service && service.then) {
       debug(
-        'Dependency alias %s is a promise. Waiting for it to resolve to register it.',
+        'Service with alias %s is a promise. Waiting for it to resolve to be registered.',
         alias
       )
 
-      dependency.then(dep => register(dep))
+      service.then(service => register(service))
 
       return
     }
 
-    register(dependency)
+    register(service)
   }
 }

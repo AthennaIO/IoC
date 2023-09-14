@@ -7,10 +7,16 @@
  * file that was distributed with this source code.
  */
 
-export class StringHelper {
+import { Service } from '#src'
+
+@Service({
+  camelAlias: 'stringHelper',
+  alias: 'App/Services/StringHelper'
+})
+export class StringHelperFake {
   public constructor() {}
 
   public run() {
-    return 'foo'
+    return 'fake'
   }
 }
