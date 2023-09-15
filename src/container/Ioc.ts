@@ -245,6 +245,10 @@ export class Ioc {
       this.alias(String.toCamelCase(subAlias), meta.alias)
     }
 
+    if (meta.name) {
+      this.alias(meta.name, meta.alias)
+    }
+
     if (meta.camelAlias) {
       this.alias(meta.camelAlias, meta.alias)
     }

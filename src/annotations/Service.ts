@@ -36,6 +36,6 @@ export function Service(options?: ServiceOptions): ClassDecorator {
       return
     }
 
-    Annotation.defineServiceMeta(target, options)
+    Annotation.defineMeta(target, options)
   }
 }

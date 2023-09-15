@@ -208,6 +208,7 @@ export default class IocTest extends BaseTest {
 
     assert.isTrue(container.has('clientService'))
     assert.isTrue(container.has('App/Services/ClientService'))
+    assert.isTrue(container.has('App/Services/Names/ClientService'))
   }
 
   @Test()
@@ -218,5 +219,6 @@ export default class IocTest extends BaseTest {
     assert.isTrue(container.has('App/Services/StringHelper'))
     assert.isTrue(container.has('clientService'))
     assert.isTrue(container.has('App/Services/ClientService'))
+    assert.isTrue(container.has('App/Services/Names/ClientService'))
   }
 }

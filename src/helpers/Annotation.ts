@@ -7,12 +7,6 @@
  * file that was distributed with this source code.
  */
 
-import {
-  IOC_TYPE,
-  IOC_ALIAS,
-  IOC_REGISTERED,
-  IOC_CAMEL_ALIAS
-} from '#src/constants/MetadataKeys'
 import { Options } from '@athenna/common'
 import type { ServiceOptions } from '#src'
 
@@ -20,7 +14,8 @@ export type ServiceMeta = {
   type: string
   alias: string
   camelAlias?: string
-  isRegistered: boolean
+  registered: boolean
+  [key: string]: any
 }
 
 export class Annotation {
@@ -28,57 +23,51 @@ export class Annotation {
    * Verify if provider is decorated or not.
    */
   public static isAnnotated(target: any): boolean {
-    return Reflect.hasMetadata(IOC_REGISTERED, target)
+    return Reflect.hasMetadata('ioc:registered', target)
   }
 
   /**
    * Define all metadata for a service.
    */
-  public static defineServiceMeta(target: any, options: ServiceOptions) {
-    Options.whenDefined(options.type, type => {
-      Reflect.defineMetadata(IOC_TYPE, type, target)
+  public static defineMeta(target: any, options: ServiceOptions) {
+    Object.keys(options).forEach(key => {
+      const value = options[key]
+
+      Options.whenDefined(value, value => {
+        Reflect.defineMetadata(`ioc:${key}`, value, target)
+      })
     })
 
-    Options.whenDefined(options.alias, alias => {
-      Reflect.defineMetadata(IOC_ALIAS, alias, target)
-    })
-
-    Options.whenDefined(options.camelAlias, camelAlias => {
-      Reflect.defineMetadata(IOC_CAMEL_ALIAS, camelAlias, target)
-    })
-
-    if (Annotation.hasAllMetaDefined(target)) {
-      Reflect.defineMetadata(IOC_REGISTERED, false, target)
-    }
+    Reflect.defineMetadata('ioc:registered', false, target)
   }
 
   /**
    * Define the service as registered.
    */
   public static defineAsRegistered(target: any) {
-    Reflect.defineMetadata(IOC_REGISTERED, true, target)
-  }
-
-  /**
-   * Verify if all metadata is defined in the service.
-   */
-  public static hasAllMetaDefined(target: any) {
-    const hasType = Reflect.hasMetadata(IOC_TYPE, target)
-    const hasAlias = Reflect.hasMetadata(IOC_ALIAS, target)
-
-    return hasType && hasAlias
+    Reflect.defineMetadata('ioc:registered', true, target)
   }
 
   /**
    * Get all the metadata from the service.
    */
   public static getMeta(target: any): ServiceMeta {
-    return {
-      type: Reflect.getMetadata(IOC_TYPE, target) || 'transient',
-      alias:
-        Reflect.getMetadata(IOC_ALIAS, target) || `App/Services/${target.name}`,
-      camelAlias: Reflect.getMetadata(IOC_CAMEL_ALIAS, target),
-      isRegistered: Reflect.getMetadata(IOC_REGISTERED, target)
+    const meta: any = {}
+
+    Reflect.getMetadataKeys(target).forEach(key => {
+      const value = Reflect.getMetadata(key, target)
+
+      meta[key.replace('ioc:', '')] = value
+    })
+
+    if (!meta.type) {
+      meta.type = 'transient'
     }
+
+    if (!meta.alias) {
+      meta.alias = `App/Services/${target.name}`
+    }
+
+    return meta
   }
 }
