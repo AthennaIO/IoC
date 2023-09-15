@@ -13,6 +13,7 @@ export * from '#src/globals/Ioc'
 
 export * from '#src/container/Ioc'
 export * from '#src/facades/Facade'
+export * from '#src/helpers/Annotation'
 export * from '#src/annotations/Inject'
 export * from '#src/annotations/Service'
 export * from '#src/annotations/InjectStub'

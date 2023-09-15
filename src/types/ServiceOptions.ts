@@ -32,4 +32,6 @@ export type ServiceOptions = {
    * @default 'transient'
    */
   type?: 'fake' | 'scoped' | 'singleton' | 'transient'
+
+  [key: string]: any
 }

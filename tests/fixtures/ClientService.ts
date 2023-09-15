@@ -14,7 +14,9 @@ export interface Client {
   name: string
 }
 
-@Service()
+@Service({
+  name: 'App/Services/Names/ClientService'
+})
 export class ClientService {
   private signature = Math.random()
 

@@ -22,7 +22,7 @@ export default class ServiceAnnotationTest extends BaseTest {
     assert.equal(metadata.type, 'transient')
     assert.equal(metadata.camelAlias, 'productService')
     assert.equal(metadata.alias, 'App/Services/ProductService')
-    assert.equal(metadata.isRegistered, false)
+    assert.equal(metadata.registered, false)
   }
 
   @Test()
