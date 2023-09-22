@@ -236,7 +236,7 @@ export class Ioc {
     const Service = await Module.resolve(versionedPath, options.metaUrl)
     const meta = Annotation.getMeta(Service)
 
-    this[meta.type](meta.alias)
+    this[meta.type](meta.alias, Service)
     Annotation.defineAsRegistered(Service)
 
     if (meta.alias.includes('/') && options.addCamelAlias && !meta.camelAlias) {

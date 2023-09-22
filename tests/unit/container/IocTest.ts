@@ -199,7 +199,9 @@ export default class IocTest extends BaseTest {
     await container.loadModule(Path.fixtures('StringHelper.ts'))
 
     assert.isTrue(container.has('stringHelper'))
+    assert.equal(container.use('stringHelper').run(), 'foo')
     assert.isTrue(container.has('App/Services/StringHelper'))
+    assert.equal(container.use('App/Services/StringHelper').run(), 'foo')
   }
 
   @Test()
@@ -207,8 +209,22 @@ export default class IocTest extends BaseTest {
     await container.loadModule(Path.fixtures('ClientService.ts'))
 
     assert.isTrue(container.has('clientService'))
+    assert.deepEqual(container.use('clientService').find(), [
+      { id: 1, name: 'LinkApi' },
+      { id: 2, name: 'Semantix' }
+    ])
+
     assert.isTrue(container.has('App/Services/ClientService'))
+    assert.deepEqual(container.use('App/Services/ClientService').find(), [
+      { id: 1, name: 'LinkApi' },
+      { id: 2, name: 'Semantix' }
+    ])
+
     assert.isTrue(container.has('App/Services/Names/ClientService'))
+    assert.deepEqual(container.use('App/Services/Names/ClientService').find(), [
+      { id: 1, name: 'LinkApi' },
+      { id: 2, name: 'Semantix' }
+    ])
   }
 
   @Test()
