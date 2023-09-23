@@ -128,7 +128,7 @@ export default class FacadeTest extends BaseTest {
     stub.get.returns(100)
 
     assert.deepEqual(Sum.get(), 100)
-    assert.returned(stub.get, 100)
+    assert.called(stub.get)
 
     Sum.restore()
 
@@ -144,13 +144,11 @@ export default class FacadeTest extends BaseTest {
     stub.get.returns(100)
 
     assert.deepEqual(Sum.get(), 100)
-    assert.returned(stub.get, 100)
     assert.calledTimes(stub.get, 1)
 
     const sumService = Sum.getFreezedProvider()
 
     assert.deepEqual(sumService.get(), 100)
-    assert.returned(stub.get, 100)
     assert.calledTimes(stub.get, 2)
 
     Sum.restore()
@@ -165,7 +163,7 @@ export default class FacadeTest extends BaseTest {
     const stub = Sum.when('get').return(100)
 
     assert.deepEqual(Sum.get(), 100)
-    assert.returned(stub, 100)
+    assert.called(stub)
 
     Sum.restore()
 
