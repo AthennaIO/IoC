@@ -8,9 +8,12 @@
  */
 
 import { debug } from '#src/debug'
-import { Is } from '@athenna/common'
-import { Mock, MockBuilder, type StubInstance } from '@athenna/test'
+import { Is, Module } from '@athenna/common'
+import type { StubInstance, MockBuilder, Mock as MockType } from '@athenna/test'
 import { PROTECTED_FACADE_METHODS } from '#src/constants/ProtectedFacadeMethods'
+
+const athennaTest = await Module.safeImport('@athenna/test')
+const Mock: typeof MockType = athennaTest?.Mock
 
 export class FacadeProxyHandler<T = any> {
   /**
@@ -76,7 +79,7 @@ export class FacadeProxyHandler<T = any> {
    */
   public stub(): StubInstance<T> {
     this.provider = this.getProvider()
-    this.stubbed = Mock.stub(this.provider)
+    this.stubbed = athennaTest.Mock.stub(this.provider)
 
     return this.stubbed
   }
