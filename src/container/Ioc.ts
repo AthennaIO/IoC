@@ -232,8 +232,7 @@ export class Ioc {
       metaUrl: pathToFileURL(Path.pwd()).href
     })
 
-    const versionedPath = `${path}?version=${Math.random()}`
-    const Service = await Module.resolve(versionedPath, options.metaUrl)
+    const Service = await Module.resolve(path, options.metaUrl)
     const meta = Annotation.getMeta(Service)
 
     this[meta.type](meta.alias, Service)
