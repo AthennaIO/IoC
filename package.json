@@ -1,6 +1,6 @@
 {
   "name": "@athenna/ioc",
-  "version": "4.5.0",
+  "version": "4.6.0",
   "description": "Global Ioc helper for Athenna ecosystem. Built on top of awilix.",
   "license": "MIT",
   "author": "João Lenon <lenon@athenna.io>",
@@ -23,8 +23,8 @@
   "scripts": {
     "build": "node node_modules/@athenna/tsconfig/src/build.js",
     "lint:fix": "eslint \"{bin,src,tests}/**/*.ts\" --fix",
-    "test": "npm run --silent lint:fix && node --import=@athenna/tsconfig bin/test.ts",
-    "test:debug": "cross-env NODE_DEBUG=athenna:* node --inspect --import=@athenna/tsconfig bin/test.ts",
+    "test": "npm run --silent lint:fix && node --enable-source-maps --import=@athenna/tsconfig bin/test.ts",
+    "test:debug": "cross-env NODE_DEBUG=athenna:* node --inspect --enable-source-maps --import=@athenna/tsconfig bin/test.ts",
     "test:coverage": "c8 npm run --silent test"
   },
   "files": [
@@ -58,8 +58,8 @@
     "awilix": "^7.0.3"
   },
   "devDependencies": {
-    "@athenna/common": "^4.17.0",
-    "@athenna/test": "^4.10.0",
+    "@athenna/common": "^4.17.2",
+    "@athenna/test": "^4.11.0",
     "@athenna/tsconfig": "^4.8.2",
     "@typescript-eslint/eslint-plugin": "^6.7.4",
     "@typescript-eslint/parser": "^6.7.4",
