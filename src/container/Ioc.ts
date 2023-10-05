@@ -20,8 +20,8 @@ import {
   type ContainerOptions
 } from 'awilix'
 
+import { sep } from 'node:path'
 import { debug } from '#src/debug'
-import { pathToFileURL } from 'node:url'
 import type { LoadModuleOptions } from '#src'
 import { Annotation } from '#src/helpers/Annotation'
 import { Is, Exec, String, Module, Options } from '@athenna/common'
@@ -229,10 +229,10 @@ export class Ioc {
   ): Promise<void> {
     options = Options.create(options, {
       addCamelAlias: true,
-      metaUrl: pathToFileURL(Path.pwd()).href
+      parentURL: Path.toHref(Path.pwd() + sep)
     })
 
-    const Service = await Module.resolve(path, options.metaUrl)
+    const Service = await Module.resolve(path, options.parentURL)
     const meta = Annotation.getMeta(Service)
 
     this[meta.type](meta.alias, Service)
@@ -308,7 +308,7 @@ export class Ioc {
     const register = service => {
       const binder = this.getAwilixBinder(options.type, service)
 
-      debug('Registering service: %o', {
+      debug('registering service: %o', {
         name: service?.name,
         type: options.type,
         alias
@@ -319,7 +319,7 @@ export class Ioc {
 
     if (service && service.then) {
       debug(
-        'Service with alias %s is a promise. Waiting for it to resolve to be registered.',
+        'service with alias %s is a promise. waiting for it to resolve to be registered.',
         alias
       )
 

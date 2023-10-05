@@ -9,13 +9,13 @@
 
 export type LoadModuleOptions = {
   /**
-   * The meta url that will be used in Module.resolve
+   * The parent URL that will be used in Module.resolve()
    * method. This option is useful to determined which
    * node_modules should be used to import the path.
    *
-   * @default 'pathToFileURL(Path.pwd()).href'
+   * @default 'Path.toHref(Path.pwd() + sep)'
    */
-  metaUrl?: string
+  parentURL?: string
 
   /**
    * Automatically add the camel alias based on the

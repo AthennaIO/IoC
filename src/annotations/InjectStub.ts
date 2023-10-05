@@ -22,7 +22,7 @@ export function InjectStub(Service: any): PropertyDecorator {
   return (target: any, key: string | symbol) => {
     let { alias, camelAlias } = Annotation.getMeta(Service)
 
-    debug('Injecting stubbed service %o', {
+    debug('injecting stubbed service %o', {
       alias,
       target: target.constructor.name,
       targetKey: key,

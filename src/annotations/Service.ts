@@ -25,13 +25,13 @@ export function Service(options?: ServiceOptions): ClassDecorator {
       camelAlias: String.toCamelCase(target.name)
     })
 
-    debug('Registering service in the service container %o', {
+    debug('registering service in the service container %o', {
       name: target.name,
       ...options
     })
 
     if (ioc.has(options.alias) || ioc.has(options.camelAlias)) {
-      debug('Skipping registration, service is already registered.')
+      debug('skipping registration, service is already registered.')
 
       return
     }

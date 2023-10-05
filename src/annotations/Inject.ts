@@ -19,7 +19,7 @@ export function Inject(alias?: string): PropertyDecorator {
   return (target: any, key: string | symbol) => {
     alias = alias || (key as string)
 
-    debug('Injecting service %o', {
+    debug('injecting service %o', {
       alias,
       target: target.constructor.name,
       targetKey: key

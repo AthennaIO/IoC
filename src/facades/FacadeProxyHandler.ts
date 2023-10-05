@@ -139,7 +139,7 @@ export class FacadeProxyHandler<T = any> {
    */
   public get(_, key: string): any {
     if (PROTECTED_FACADE_METHODS.includes(key)) {
-      debug('Restricted facade method executed: %s', key)
+      debug('restricted facade method executed: %s', key)
 
       const method = this[key]
 
