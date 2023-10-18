@@ -7,9 +7,14 @@
  * file that was distributed with this source code.
  */
 
+import type {
+  SpyInstance,
+  MockBuilder,
+  StubInstance,
+  Mock as MockType
+} from '@athenna/test'
 import { debug } from '#src/debug'
 import { Is, Module } from '@athenna/common'
-import type { StubInstance, MockBuilder, Mock as MockType } from '@athenna/test'
 import { PROTECTED_FACADE_METHODS } from '#src/constants/ProtectedFacadeMethods'
 
 const athennaTest = await Module.safeImport('@athenna/test')
@@ -27,11 +32,6 @@ export class FacadeProxyHandler<T = any> {
    * The service instance.
    */
   private provider: T = null
-
-  /**
-   * The stubbed service instance.
-   */
-  private stubbed: StubInstance<T> = null
 
   /**
    * Creates a new instance of FacadeProxyHandler.
@@ -74,14 +74,25 @@ export class FacadeProxyHandler<T = any> {
 
   /**
    * Resolves a service instance of the
-   * facade and save it to be used instead of the
-   * original one.
+   * facade and save it to be used as stub.
+   *
+   * The stub will be used instead of resolving
+   * the service.
    */
   public stub(): StubInstance<T> {
-    this.provider = this.getProvider()
-    this.stubbed = athennaTest.Mock.stub(this.provider)
+    this.freeze()
 
-    return this.stubbed
+    return Mock.stub(this.provider)
+  }
+
+  /**
+   * Resolve a service instance of the facade
+   * and save it to be
+   */
+  public spy(): SpyInstance<T> {
+    this.freeze()
+
+    return Mock.spy(this.provider)
   }
 
   /**
@@ -89,20 +100,22 @@ export class FacadeProxyHandler<T = any> {
    * of the facade.
    */
   public when(method: keyof T): MockBuilder {
-    this.provider = this.getProvider()
+    this.freeze()
 
-    const stub = Mock.when<T>(this.provider, method)
-
-    return stub
+    return Mock.when<T>(this.provider, method)
   }
 
   /**
-   * Restore the facade to the original state
-   * by removing the stubbed instance.
+   * Restore the mocked facade to the original state.
    */
   public restore(): void {
-    this.stubbed = null
-    this.provider = null
+    if (!this.provider) {
+      return
+    }
+
+    Mock.restore(this.provider)
+
+    this.unfreeze()
   }
 
   /**
@@ -112,12 +125,6 @@ export class FacadeProxyHandler<T = any> {
    * the same instance when a Facade method returns this.
    */
   public set(_, key: string, value: any): boolean {
-    if (this.stubbed) {
-      this.stubbed[key] = value
-
-      return true
-    }
-
     if (this.provider) {
       this.provider[key] = value
 
@@ -148,10 +155,6 @@ export class FacadeProxyHandler<T = any> {
       }
 
       return this[key].bind(this)
-    }
-
-    if (this.stubbed) {
-      return this.stubbed[key]
     }
 
     if (this.provider) {
