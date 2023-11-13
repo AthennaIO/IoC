@@ -15,6 +15,7 @@
 | The facade proxy handler methods that are restricted for Facades.
 */
 export const PROTECTED_FACADE_METHODS = [
+  'spy',
   'stub',
   'when',
   'freeze',
