@@ -111,7 +111,7 @@ export class Ioc {
     }
 
     debug(
-      'Registering sub alias %s to %s original alias.',
+      'registering sub alias %s to %s original alias.',
       subAlias,
       originalAlias
     )

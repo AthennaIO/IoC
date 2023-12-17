@@ -13,13 +13,32 @@ import { NotFoundServiceException } from '#src/exceptions/NotFoundServiceExcepti
 
 export default class InjectAnnotationTest extends BaseTest {
   @Test()
-  public async shouldBeAbleToPreregisterServicesUsingInjectAnnotation({ assert }: Context) {
+  public async shouldBeAbleToPreregisterServicesUsingInjectAnnotationUsingPropertyType({ assert }: Context) {
+    const InjectService = await this.import('#tests/fixtures/InjectService')
+
+    const injectService = new InjectService()
+
+    assert.isDefined(injectService.clientService)
+  }
+
+  @Test()
+  public async shouldBeAbleToPreregisterServicesUsingInjectAnnotationUsingDefinedAlias({ assert }: Context) {
     const InjectService = await this.import('#tests/fixtures/InjectService')
 
     const injectService = new InjectService()
 
     assert.isDefined(injectService.userService)
-    assert.isDefined(injectService.clientService)
+  }
+
+  @Test()
+  public async shouldBeAbleToPreregisterServicesUsingInjectAnnotationUsingPropertyKeyAsAlias({ assert }: Context) {
+    const InjectService = await this.import('#tests/fixtures/InjectService')
+
+    const injectService = new InjectService()
+
+    Reflect.defineMetadata('design:type', undefined, injectService)
+
+    assert.isDefined(injectService.noMetadataService)
   }
 
   @Test()

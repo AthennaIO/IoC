@@ -23,6 +23,9 @@ export class InjectService {
   @Inject()
   private clientService: ClientService
 
+  @Inject()
+  private noMetadataService: ClientService
+
   public findOneUser(): User {
     return this.userService.find()[0]
   }
