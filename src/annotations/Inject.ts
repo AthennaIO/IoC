@@ -17,6 +17,12 @@ import { Facade } from '#src/facades/Facade'
  */
 export function Inject(alias?: string): PropertyDecorator {
   return (target: any, key: string | symbol) => {
+    const injected = Reflect.getMetadata('design:type', target, key)
+
+    if (!alias && injected) {
+      alias = Reflect.getMetadata('ioc:alias', injected)
+    }
+
     alias = alias || (key as string)
 
     debug('injecting service %o', {
