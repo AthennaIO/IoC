@@ -160,7 +160,7 @@ export default class FacadeTest extends BaseTest {
   public async shouldBeAbleToCreateStubsForFacadeMethods({ assert }: Context) {
     const Sum = Facade.createFor<SumService>('SumService')
 
-    const stub = Sum.when('get').return(100)
+    const stub = Sum.when('get').return(100).get()
 
     assert.deepEqual(Sum.get(), 100)
     assert.called(stub)
