@@ -24,7 +24,7 @@ import { sep } from 'node:path'
 import { debug } from '#src/debug'
 import type { LoadModuleOptions } from '#src'
 import { Annotation } from '#src/helpers/Annotation'
-import { Is, Exec, String, Module, Options } from '@athenna/common'
+import { Is, Path, Exec, String, Module, Options } from '@athenna/common'
 import { NotFoundServiceException } from '#src/exceptions/NotFoundServiceException'
 
 export class Ioc {
