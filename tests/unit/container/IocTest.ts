@@ -7,9 +7,9 @@
  * file that was distributed with this source code.
  */
 
-import { Exec, Module } from '@athenna/common'
 import { BaseTest } from '#tests/helpers/BaseTest'
 import { Test, type Context } from '@athenna/test'
+import { Path, Exec, Module } from '@athenna/common'
 import { UserService } from '#tests/fixtures/UserService'
 import { ClientService } from '#tests/fixtures/ClientService'
 import { ClientServiceMock } from '#tests/fixtures/ClientServiceMock'

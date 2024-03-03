@@ -13,7 +13,7 @@ export type LoadModuleOptions = {
    * method. This option is useful to determined which
    * node_modules should be used to import the path.
    *
-   * @default 'Path.toHref(Path.pwd() + sep)'
+   * @default Path.toHref(Path.pwd() + sep)
    */
   parentURL?: string
 
