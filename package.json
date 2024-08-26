@@ -1,6 +1,6 @@
 {
   "name": "@athenna/ioc",
-  "version": "4.27.0",
+  "version": "5.0.0",
   "description": "Global Ioc helper for Athenna ecosystem. Built on top of awilix.",
   "license": "MIT",
   "author": "João Lenon <lenon@athenna.io>",
@@ -58,9 +58,9 @@
     "awilix": "^10.0.2"
   },
   "devDependencies": {
-    "@athenna/common": "^4.46.0",
-    "@athenna/test": "^4.30.0",
-    "@athenna/tsconfig": "^4.19.0",
+    "@athenna/common": "^5.0.0",
+    "@athenna/test": "^5.0.0",
+    "@athenna/tsconfig": "^5.0.0",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
     "commitizen": "^4.3.0",
