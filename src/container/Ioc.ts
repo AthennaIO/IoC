@@ -24,10 +24,10 @@ import { sep } from 'node:path'
 import { debug } from '#src/debug'
 import type { LoadModuleOptions } from '#src'
 import { Annotation } from '#src/helpers/Annotation'
-import { Is, Path, Exec, String, Module, Options } from '@athenna/common'
+import { Is, Path, String, Module, Options, Macroable } from '@athenna/common'
 import { NotFoundServiceException } from '#src/exceptions/NotFoundServiceException'
 
-export class Ioc {
+export class Ioc extends Macroable {
   /**
    * Hold all the services that are fakes. The fake
    * services will never be replaced if its alias
@@ -44,6 +44,8 @@ export class Ioc {
    * Creates a new instance of IoC.
    */
   public constructor(options?: ContainerOptions) {
+    super()
+
     if (Ioc.container) {
       return this
     }
@@ -261,7 +263,7 @@ export class Ioc {
     paths: string[],
     options: LoadModuleOptions = {}
   ): Promise<void> {
-    await Exec.concurrently(paths, async path => {
+    await paths.athenna.concurrently(async path => {
       await this.loadModule(path, options)
     })
   }

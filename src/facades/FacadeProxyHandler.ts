@@ -14,13 +14,13 @@ import type {
   Mock as MockType
 } from '@athenna/test'
 import { debug } from '#src/debug'
-import { Is, Module } from '@athenna/common'
+import { Is, Module, Macroable } from '@athenna/common'
 import { PROTECTED_FACADE_METHODS } from '#src/constants/ProtectedFacadeMethods'
 
 const athennaTest = await Module.safeImport('@athenna/test')
 const Mock: typeof MockType = athennaTest?.Mock
 
-export class FacadeProxyHandler<T = any> {
+export class FacadeProxyHandler<T = any> extends Macroable {
   /**
    * The facade accessor that will be used
    * to resolve the service inside the
@@ -37,6 +37,7 @@ export class FacadeProxyHandler<T = any> {
    * Creates a new instance of FacadeProxyHandler.
    */
   public constructor(facadeAccessor: string) {
+    super()
     this.facadeAccessor = facadeAccessor
   }
 
