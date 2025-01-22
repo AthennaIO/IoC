@@ -9,7 +9,7 @@
 
 import { BaseTest } from '#tests/helpers/BaseTest'
 import { Test, type Context } from '@athenna/test'
-import { Path, Exec, Module } from '@athenna/common'
+import { Path, Module, Sleep } from '@athenna/common'
 import { UserService } from '#tests/fixtures/UserService'
 import { ClientService } from '#tests/fixtures/ClientService'
 import { ClientServiceMock } from '#tests/fixtures/ClientServiceMock'
@@ -184,7 +184,7 @@ export default class IocTest extends BaseTest {
   public async shouldBeAbleToRegisterServicesAsPromises({ assert }: Context) {
     container.transient('Services/ClientService', Module.get(import('#tests/fixtures/ClientService')))
 
-    await Exec.sleep(10)
+    await Sleep.for(10).milliseconds().wait()
 
     const clientService = container.safeUse<ClientService>('Services/ClientService')
 
