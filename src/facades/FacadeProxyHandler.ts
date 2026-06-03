@@ -17,9 +17,6 @@ import { debug } from '#src/debug'
 import { Is, Module, Macroable } from '@athenna/common'
 import { PROTECTED_FACADE_METHODS } from '#src/constants/ProtectedFacadeMethods'
 
-const athennaTest = await Module.safeImport('@athenna/test')
-const Mock: typeof MockType = athennaTest?.Mock
-
 export class FacadeProxyHandler<T = any> extends Macroable {
   /**
    * The facade accessor that will be used
@@ -32,6 +29,12 @@ export class FacadeProxyHandler<T = any> extends Macroable {
    * The service instance.
    */
   private provider: T = null
+
+  /**
+   * The mock instance to mock and stub
+   * facade methods.
+   */
+  private mock: typeof MockType
 
   /**
    * Creates a new instance of FacadeProxyHandler.
@@ -83,7 +86,7 @@ export class FacadeProxyHandler<T = any> extends Macroable {
   public stub(): StubInstance<T> {
     this.freeze()
 
-    return Mock.stub(this.provider)
+    return this.getMockInstance().stub(this.provider)
   }
 
   /**
@@ -93,7 +96,7 @@ export class FacadeProxyHandler<T = any> extends Macroable {
   public spy(): SpyInstance<T> {
     this.freeze()
 
-    return Mock.spy(this.provider)
+    return this.getMockInstance().spy(this.provider)
   }
 
   /**
@@ -103,7 +106,7 @@ export class FacadeProxyHandler<T = any> extends Macroable {
   public when(method: keyof T): MockBuilder {
     this.freeze()
 
-    return Mock.when<T>(this.provider, method)
+    return this.getMockInstance().when<T>(this.provider, method)
   }
 
   /**
@@ -114,7 +117,7 @@ export class FacadeProxyHandler<T = any> extends Macroable {
       return
     }
 
-    Mock.restore(this.provider)
+    this.getMockInstance().restore(this.provider)
 
     this.unfreeze()
   }
@@ -175,5 +178,20 @@ export class FacadeProxyHandler<T = any> extends Macroable {
     return new Proxy(provider[key], {
       apply: (method, _this, args) => method.bind(provider)(...args)
     })
+  }
+
+  /**
+   * Get or create mock instance.
+   */
+  private getMockInstance() {
+    if (this.mock) {
+      return this.mock
+    }
+
+    const athennaTest = await Module.safeImport('@athenna/test')
+
+    this.mock = athennaTest?.Mock
+
+    return this.mock
   }
 }
