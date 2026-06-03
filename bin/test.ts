@@ -10,6 +10,7 @@
 import { Runner } from '@athenna/test'
 
 await Runner.setTsEnv()
+  .setAppEnv()
   .addAssertPlugin()
   .addPath('tests/unit/**/*.ts')
   .setCliArgs(process.argv.slice(2))

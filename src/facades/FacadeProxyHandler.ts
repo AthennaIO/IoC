@@ -13,12 +13,18 @@ import type {
   StubInstance,
   Mock as MockType
 } from '@athenna/test'
+
 import { debug } from '#src/debug'
 import { Is, Module, Macroable } from '@athenna/common'
 import { PROTECTED_FACADE_METHODS } from '#src/constants/ProtectedFacadeMethods'
 
-const athennaTest = await Module.safeImport('@athenna/test')
-const Mock: typeof MockType = athennaTest?.Mock
+let Mock: typeof MockType
+
+if (process.argv[2] === 'test' || process.env.APP_ENV === 'test') {
+  const athennaTest = await Module.safeImport('@athenna/test')
+
+  Mock = athennaTest?.Mock
+}
 
 export class FacadeProxyHandler<T = any> extends Macroable {
   /**
@@ -83,7 +89,7 @@ export class FacadeProxyHandler<T = any> extends Macroable {
   public stub(): StubInstance<T> {
     this.freeze()
 
-    return Mock.stub(this.provider)
+    return this.getMockInstance().stub(this.provider)
   }
 
   /**
@@ -93,7 +99,7 @@ export class FacadeProxyHandler<T = any> extends Macroable {
   public spy(): SpyInstance<T> {
     this.freeze()
 
-    return Mock.spy(this.provider)
+    return this.getMockInstance().spy(this.provider)
   }
 
   /**
@@ -103,7 +109,7 @@ export class FacadeProxyHandler<T = any> extends Macroable {
   public when(method: keyof T): MockBuilder {
     this.freeze()
 
-    return Mock.when<T>(this.provider, method)
+    return this.getMockInstance().when<T>(this.provider, method)
   }
 
   /**
@@ -114,7 +120,7 @@ export class FacadeProxyHandler<T = any> extends Macroable {
       return
     }
 
-    Mock.restore(this.provider)
+    this.getMockInstance().restore(this.provider)
 
     this.unfreeze()
   }
@@ -175,5 +181,19 @@ export class FacadeProxyHandler<T = any> extends Macroable {
     return new Proxy(provider[key], {
       apply: (method, _this, args) => method.bind(provider)(...args)
     })
+  }
+
+  /**
+   * Get the mock class preloaded from `@athenna/test`.
+   */
+  private getMockInstance(): typeof MockType {
+    if (!Mock) {
+      throw new Error(
+        'Cannot mock facade methods because "@athenna/test" is not installed or you are not running in a testing environment. ' +
+          'Install it as a development dependency to use stub(), spy() and when().'
+      )
+    }
+
+    return Mock
   }
 }

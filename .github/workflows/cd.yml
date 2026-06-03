@@ -8,6 +8,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -15,7 +18,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v1
         with:
-          node-version: '18.x'
+          node-version: '21.x'
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
@@ -24,25 +27,15 @@ jobs:
       - name: Compile code
         run: npm run build
 
-      - name: Copy README to build
-        run: cp README.md build/README.md | true
-
-      - name: Copy LICENSE to build
-        run: cp LICENSE.md build/LICENSE.md | true
-
-      - name: Copy templates to build
-        run: cp -r templates build/templates | true
-
-      - name: Copy configurer to build
-        run: cp -r configurer build/configurer | true
+      - name: Install production dependencies
+        run: cd build && npm ci --omit=dev
 
       - name: Automatic GitHub Release
         uses: justincy/github-action-npm-release@2.0.1
         id: release
 
       - name: Publish to NPM Registry
-        run: cd build && npm publish --access public
+        run: cd build && npm publish --provenance --access public
         if: steps.release.outputs.released == 'true'
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           name: Deploy
