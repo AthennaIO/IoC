@@ -13,9 +13,18 @@ import type {
   StubInstance,
   Mock as MockType
 } from '@athenna/test'
+
 import { debug } from '#src/debug'
 import { Is, Module, Macroable } from '@athenna/common'
 import { PROTECTED_FACADE_METHODS } from '#src/constants/ProtectedFacadeMethods'
+
+let Mock: typeof MockType
+
+if (process.argv[2] === 'test' || process.env.APP_ENV === 'test') {
+  const athennaTest = await Module.safeImport('@athenna/test')
+
+  Mock = athennaTest?.Mock
+}
 
 export class FacadeProxyHandler<T = any> extends Macroable {
   /**
@@ -29,12 +38,6 @@ export class FacadeProxyHandler<T = any> extends Macroable {
    * The service instance.
    */
   private provider: T = null
-
-  /**
-   * The mock instance to mock and stub
-   * facade methods.
-   */
-  private mock: typeof MockType
 
   /**
    * Creates a new instance of FacadeProxyHandler.
@@ -181,17 +184,16 @@ export class FacadeProxyHandler<T = any> extends Macroable {
   }
 
   /**
-   * Get or create mock instance.
+   * Get the mock class preloaded from `@athenna/test`.
    */
-  private getMockInstance() {
-    if (this.mock) {
-      return this.mock
+  private getMockInstance(): typeof MockType {
+    if (!Mock) {
+      throw new Error(
+        'Cannot mock facade methods because "@athenna/test" is not installed or you are not running in a testing environment. ' +
+          'Install it as a development dependency to use stub(), spy() and when().'
+      )
     }
 
-    const athennaTest = await Module.safeImport('@athenna/test')
-
-    this.mock = athennaTest?.Mock
-
-    return this.mock
+    return Mock
   }
 }
